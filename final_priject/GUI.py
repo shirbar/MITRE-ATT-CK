@@ -29,13 +29,13 @@ butn_list = [
 # check box layout
 checkBox_Malware_Archeology = [
     [
-        sg.Checkbox('Malware Archeology')
+        sg.Checkbox('Malware Archeology', key='archeology')
     ]
 ]
 
 checkBox_miriam = [
     [
-        sg.Checkbox('Miriam')
+        sg.Checkbox('Miriam', key='miriamDB')
     ]
 ]
 
@@ -74,5 +74,9 @@ while True:
             eventId_Extract(values['-FOLDER-IN-'], values['-FOLDER-OUT-'])
             getMitreDataFromUrl()
             print("pressed OK")
+        if window.FindElement('archeology').Get():
+            print("archeology CB")
 
+        if window.FindElement('miriamDB').Get():
+            print("miriamDB CB")
 window.close()
