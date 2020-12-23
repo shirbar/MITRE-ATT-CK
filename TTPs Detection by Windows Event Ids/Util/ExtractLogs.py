@@ -8,12 +8,12 @@ import PySimpleGUI as Sx
 def extract_event_ids(event_ids, in_path):
     print("retrieving data from = " + str(in_path))
     for filename in glob.glob(os.path.join(in_path, '*.xml')):
-        Sx.popup_animated("a/loading_img.gif")
+        #Sx.popup_animated("img/loading_img.gif")
         logFile = minidom.parse(filename)
         items = logFile.getElementsByTagName('EventID')
         for x in items:
             event_ids.append(int(x.firstChild.data))
-    Sx.popup_animated(None)
+    #Sx.popup_animated(None)
     if len(event_ids) == 0:
         return False
     return True

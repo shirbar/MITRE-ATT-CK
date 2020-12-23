@@ -1,3 +1,4 @@
+from time import sleep
 import PySimpleGUI as Sg
 
 from Util.ExtractLogs import extract_event_ids
@@ -6,7 +7,7 @@ from Util.GetTTPs import get_ttp_from_event_ids
 from Methods.MITRECti import get_mitre_cti_hash_map
 import Methods.EventList as EventList
 
-Sg.theme('BlueMono')
+Sg.theme('DarkBlue13')
 
 dirIn_list = [
     [
@@ -61,13 +62,21 @@ checkBox_list = [
 ]
 
 layout = [
-        [Sg.Column(dirIn_list)],
-        [Sg.Column(dirOut_list)],
-        [Sg.Column(checkBox_list)],
-        [Sg.Column(button_list)],
+    [Sg.Column(dirIn_list)],
+    [Sg.Column(dirOut_list)],
+    [Sg.Column(checkBox_list)],
+    [Sg.Column(button_list)],
 ]
 
 window = Sg.Window("TTP Detection", layout)
+
+
+def threaded_function(user_event_ids):
+    print("starting thread --------------")
+    extract_event_ids(user_event_ids, values['-FOLDER-IN-'])
+    #TODO change a global value to let the reload bar know that we are done
+    print("finished ---------")
+
 
 while True:
     event, values = window.read()
@@ -92,6 +101,7 @@ while True:
             mainHashMap = {}
             if checkBoxes[0]:
                 merge_hash_maps(mainHashMap, get_mitre_cti_hash_map())
+                pass
             if checkBoxes[1]:
                 merge_hash_maps(mainHashMap, EventList.get_event_list_hash_map())
             if checkBoxes[2]:
@@ -104,14 +114,20 @@ while True:
             print("the main hash map selected by the user output:")
             print(mainHashMap)
             # extracting the event ids from the files inside the folder
-            userEventIds = []
-            if extract_event_ids(userEventIds, values['-FOLDER-IN-']):
-                userEventIds = set(userEventIds)
+            user_event_ids = []
+            successfully_extracted = True
+            thread = Sg.Thread(target=threaded_function, args=(user_event_ids,))
+            thread.start()
+            thread.join()
+            # TODO to fix this join and make our main gui do something else like making a reloading bar
+            print("thread finished")
+            if successfully_extracted:
+                user_event_ids = set(user_event_ids)
                 # Sg.popup_quick_message("extracting event ids...")
                 print("printing the user event ids")
-                print(userEventIds)
+                print(user_event_ids)
 
-                TTPs = get_ttp_from_event_ids(mainHashMap, userEventIds)
+                TTPs = get_ttp_from_event_ids(mainHashMap, user_event_ids)
                 print("printing the TTPs")
                 print(TTPs)
             else:
@@ -129,6 +145,5 @@ while True:
         Sg.popup_ok("Updating Event List DB completed.", title="Done", auto_close_duration=5)
     elif event == "Update MalwareArcheology DB":
         Sg.popup_ok("TODO - update me")
-
 
 window.close()
