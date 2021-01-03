@@ -4,6 +4,8 @@ from xml.dom import minidom
 import PySimpleGUI as Sx
 
 
+
+
 # This function extract a set of event ids from the event logs inside the input directory in XML format.
 def extract_event_ids(event_ids, in_path):
     print("retrieving data from = " + str(in_path))

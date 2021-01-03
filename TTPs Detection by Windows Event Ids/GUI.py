@@ -72,10 +72,10 @@ window = Sg.Window("TTP Detection", layout)
 
 
 def threaded_function(user_event_ids):
-    print("starting thread --------------")
+    #print("starting thread --------------")
     extract_event_ids(user_event_ids, values['-FOLDER-IN-'])
     #TODO change a global value to let the reload bar know that we are done
-    print("finished ---------")
+    #print("finished ---------")
 
 
 while True:
@@ -111,24 +111,25 @@ while True:
 
             # Running the user event ids on the hash map he selected.
             # Those prints are only for testing
-            print("the main hash map selected by the user output:")
+            print("The hash map selected by the user check boxes:")
             print(mainHashMap)
             # extracting the event ids from the files inside the folder
             user_event_ids = []
             successfully_extracted = True
             thread = Sg.Thread(target=threaded_function, args=(user_event_ids,))
             thread.start()
+            # TODO search if I can get the length of the XML objects
+
+            for i in range(1, 300):
+                Sg.one_line_progress_meter("Progress bar", i+1, 300, "key", "retrieving data from " + str(values['-FOLDER-IN-']))
             thread.join()
-            # TODO to fix this join and make our main gui do something else like making a reloading bar
-            print("thread finished")
             if successfully_extracted:
                 user_event_ids = set(user_event_ids)
                 # Sg.popup_quick_message("extracting event ids...")
-                print("printing the user event ids")
+                print("\nThe user event ids:")
                 print(user_event_ids)
-
                 TTPs = get_ttp_from_event_ids(mainHashMap, user_event_ids)
-                print("printing the TTPs")
+                print("\nThe end result TTPs:")
                 print(TTPs)
             else:
                 Sg.popup_ok("Input Error", "The selected directory does not contain XML log file.")
@@ -142,7 +143,7 @@ while True:
         Sg.popup_ok("TODO - update me")
     elif event == "Update EventList DB":
         EventList.update_event_list_db()
-        Sg.popup_ok("Updating Event List DB completed.", title="Done", auto_close_duration=5)
+        Sg.popup_ok("Event List DB has updated.", title="Done", auto_close_duration=5)
     elif event == "Update MalwareArcheology DB":
         Sg.popup_ok("TODO - update me")
 

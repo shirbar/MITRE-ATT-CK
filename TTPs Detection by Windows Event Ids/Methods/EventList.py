@@ -4,10 +4,8 @@ import os.path
 
 
 def update_event_list_db():
-    print("updating EventList...")
     url = "https://raw.githubusercontent.com/miriamxyra/EventList/master/EventList/internal/data/EventList.db"
     urllib.request.urlretrieve(url, 'EventList.db')
-    print("update finished.")
 
 
 def get_event_list_hash_map():
