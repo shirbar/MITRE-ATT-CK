@@ -1,6 +1,9 @@
 import json
+import urllib.request
 from urllib.request import urlopen
 import re
+import sqlite3
+
 
 
 # This function pull mitre json and send to local DB the new hash map
@@ -40,3 +43,46 @@ def invert_mitre_hash_map(mitre_hash_map):
             new_dic.setdefault(int(x), []).append(k)
 
     return new_dic
+
+
+# This function download the json file from mitre cti API and save it.
+def update_mitre_cti_db():
+    url = "https://raw.githubusercontent.com/mitre/cti/master/enterprise-attack/enterprise-attack.json"
+    urllib.request.urlretrieve(url, 'Original Files/attack.json')
+    return save_to_db()
+
+
+# This function save the mitre cti tuple to Mitre_CTI.db file
+def save_to_db():
+    conn = sqlite3.connect("Mitre_CTI.db")
+    cur = conn.cursor()
+    create = "CREATE TABLE IF NOT EXISTS mitre_cti( ttp TEXT, event_ids TEXT)";
+
+    cur.execute(create)  # execute SQL commands
+    conn.commit()
+
+    mitre_cti_data = get_mitre_cti_hash_map()
+
+    mitre_cti_data = [(i, str(mitre_cti_data[i])) for i in mitre_cti_data]
+
+    insert_command = "INSERT INTO mitre_cti VALUES(?,?);"
+
+    cur.executemany(insert_command, mitre_cti_data)
+    conn.commit()
+
+# this function shwos the data inside Mitre_CTI.db
+def show_db():
+    conn = sqlite3.connect("Mitre_CTI.db")
+    cur = conn.cursor()
+    cur.execute("SELECT name FROM sqlite_master WHERE type='table';")  # show all the tables in the .db file
+    print(cur.fetchall())
+    cur.execute("SELECT * FROM mitre_cti")  # show all the data inside mitre_cti table/
+    print(cur.fetchall())
+    names = list(map(lambda x: x[0], cur.description))  # show all the columns names
+    print(names)
+
+
+update_mitre_cti_db
+#save_to_db()
+
+show_db()
