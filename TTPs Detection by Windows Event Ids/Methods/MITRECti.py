@@ -5,7 +5,6 @@ import re
 import sqlite3
 
 
-
 # This function pull mitre json and send to local DB the new hash map
 def get_mitre_cti_hash_map():
     mitre_hash_technique = {}
@@ -54,7 +53,7 @@ def update_mitre_cti_db():
 
 # This function save the mitre cti tuple to Mitre_CTI.db file
 def save_to_db():
-    conn = sqlite3.connect("Mitre_CTI.db")
+    conn = sqlite3.connect("../Databases/Mitre_CTI.db")
     cur = conn.cursor()
     create = "CREATE TABLE IF NOT EXISTS mitre_cti( ttp TEXT, event_ids TEXT)";
 
@@ -69,20 +68,24 @@ def save_to_db():
 
     cur.executemany(insert_command, mitre_cti_data)
     conn.commit()
+    show_db()
+
 
 # this function shwos the data inside Mitre_CTI.db
 def show_db():
-    conn = sqlite3.connect("Mitre_CTI.db")
+    conn = sqlite3.connect("../Databases/Mitre_CTI.db")
     cur = conn.cursor()
     cur.execute("SELECT name FROM sqlite_master WHERE type='table';")  # show all the tables in the .db file
+    print("Mitre_CTI.db__________________________________________________________________________________")
     print(cur.fetchall())
     cur.execute("SELECT * FROM mitre_cti")  # show all the data inside mitre_cti table/
     print(cur.fetchall())
     names = list(map(lambda x: x[0], cur.description))  # show all the columns names
     print(names)
+    print("Mitre_CTI.db_end______________________________________________________________________________")
 
 
-update_mitre_cti_db
+# update_mitre_cti_db
 #save_to_db()
 
-show_db()
+#show_db()
