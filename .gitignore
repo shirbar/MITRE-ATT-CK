@@ -1,2 +1,6 @@
 
 *.pyc
+.idea/workspace.xml
+TTPs Detection by Windows Event Ids/Methods/__pycache__/EventList.cpython-38.pyc
+TTPs Detection by Windows Event Ids/Methods/__pycache__/MITRECti.cpython-38.pyc
+TTPs Detection by Windows Event Ids/Util/__pycache__/ExtractLogs.cpython-38.pyc
