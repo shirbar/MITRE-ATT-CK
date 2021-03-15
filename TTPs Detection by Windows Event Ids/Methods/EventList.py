@@ -1,3 +1,4 @@
+import json
 import urllib.request
 import sqlite3
 import os.path
@@ -5,15 +6,20 @@ import os.path
 
 def update_event_list_db():
     url = "https://raw.githubusercontent.com/miriamxyra/EventList/master/EventList/internal/data/EventList.db"
-    urllib.request.urlretrieve(url, 'EventList.db')
+    fileName, headers = urllib.request.urlretrieve(url, 'Original Files/EventList.db')
+    with open("Util/MethodsDate.json", "r") as jsonFile:
+        data = json.load(jsonFile)
+    data["EventList"] = headers['Content-Length']
+    with open("Util/MethodsDate.json", "w") as jsonFile:
+        json.dump(data, jsonFile)
 
 
 def get_event_list_hash_map():
     EventListHashMap = {}
-    if not os.path.exists("EventList.db"):
+    if not os.path.exists("Original Files/EventList.db"):
         update_event_list_db()
     try:
-        sqliteConnection = sqlite3.connect("EventList.db")
+        sqliteConnection = sqlite3.connect("Original Files/EventList.db")
         cursor = sqliteConnection.cursor()
         sqlite_select_Query = "select E.event_id, T.technique_id from mitre_events E, mitre_techniques T where " \
                               "E.technique_id = T.id; "
