@@ -23,7 +23,7 @@ def get_mitre_cti_hash_map():
                     else:
                         mitre_hash_technique[key] = eventIds
     return invert_mitre_hash_map(mitre_hash_technique)
-
+    #return mitre_hash_technique
 
 # This function gets the x_mire_detection str.split string and return the event ids thet can be use with this techniqe
 def get_event_ids(description):
@@ -42,13 +42,6 @@ def invert_mitre_hash_map(mitre_hash_map):
             new_dic.setdefault(int(x), []).append(k)
 
     return new_dic
-
-
-# This function download the json file from mitre cti API and save it.
-def update_mitre_cti_db():
-    url = "https://raw.githubusercontent.com/mitre/cti/master/enterprise-attack/enterprise-attack.json"
-    urllib.request.urlretrieve(url, 'Original Files/attack.json')
-    return save_to_db()
 
 
 # This function save the mitre cti tuple to Mitre_CTI.db file
@@ -85,7 +78,3 @@ def show_db():
     print("Mitre_CTI.db_end______________________________________________________________________________")
 
 
-# update_mitre_cti_db
-#save_to_db()
-
-#show_db()
