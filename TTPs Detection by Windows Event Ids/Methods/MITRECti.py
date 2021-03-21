@@ -3,7 +3,7 @@ import urllib.request
 from urllib.request import urlopen
 import re
 import sqlite3
-
+import os.path
 
 # This function pull mitre json and send to local DB the new hash map
 def get_mitre_cti_hash_map():
@@ -23,7 +23,8 @@ def get_mitre_cti_hash_map():
                     else:
                         mitre_hash_technique[key] = eventIds
     return invert_mitre_hash_map(mitre_hash_technique)
-    #return mitre_hash_technique
+    # return mitre_hash_technique
+
 
 # This function gets the x_mire_detection str.split string and return the event ids thet can be use with this techniqe
 def get_event_ids(description):
@@ -45,17 +46,17 @@ def invert_mitre_hash_map(mitre_hash_map):
 
 
 # This function save the mitre cti tuple to Mitre_CTI.db file
-def save_to_db():
-    conn = sqlite3.connect("../Databases/Mitre_CTI.db")
+def save_mitre_cti_to_db():
+    conn = sqlite3.connect("Databases/Mitre_CTI.db")
     cur = conn.cursor()
-    create = "CREATE TABLE IF NOT EXISTS mitre_cti( ttp TEXT, event_ids TEXT)";
+    create = "CREATE TABLE IF NOT EXISTS mitre_cti( event_id INT, ttp TEXT)";
 
     cur.execute(create)  # execute SQL commands
     conn.commit()
 
     mitre_cti_data = get_mitre_cti_hash_map()
 
-    mitre_cti_data = [(i, str(mitre_cti_data[i])) for i in mitre_cti_data]
+    mitre_cti_data = [(int(i), str(mitre_cti_data[i])) for i in mitre_cti_data]#--------------------------------------------------
 
     insert_command = "INSERT INTO mitre_cti VALUES(?,?);"
 
@@ -66,7 +67,8 @@ def save_to_db():
 
 # this function shwos the data inside Mitre_CTI.db
 def show_db():
-    conn = sqlite3.connect("../Databases/Mitre_CTI.db")
+    print("kfir")
+    conn = sqlite3.connect("Databases/Mitre_CTI.db")
     cur = conn.cursor()
     cur.execute("SELECT name FROM sqlite_master WHERE type='table';")  # show all the tables in the .db file
     print("Mitre_CTI.db__________________________________________________________________________________")
@@ -76,5 +78,30 @@ def show_db():
     names = list(map(lambda x: x[0], cur.description))  # show all the columns names
     print(names)
     print("Mitre_CTI.db_end______________________________________________________________________________")
+
+
+def get_mitre_cti_hash_map_from_db():
+    print("Hen")
+    mitreCTIHashMap = {}
+    if not os.path.exists("Databases/Mitre_CTI.db"):  # or "Databases/Mitre_CTI.db"
+        save_mitre_cti_to_db()
+    try:
+        sqliteConnection = sqlite3.connect("Databases/Mitre_CTI.db")
+        cursor = sqliteConnection.cursor()
+        sqlite_select_Query = "select event_id, ttp from mitre_cti"
+        cursor.execute(sqlite_select_Query)
+        record = cursor.fetchall()
+        #print(mitreCTIHashMap)
+        for rec in record:
+            if rec[0] in mitreCTIHashMap.keys():
+                mitreCTIHashMap[int(rec[0])].append(rec[1])
+            else:
+                #print(rec[0])
+                mitreCTIHashMap[int(rec[0])] = [rec[1]]
+        cursor.close()
+        sqliteConnection.close()
+        return mitreCTIHashMap
+    except sqlite3.Error as error:
+        print("error while connecting to sqlite ", error)
 
 
