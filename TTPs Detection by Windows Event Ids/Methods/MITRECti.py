@@ -5,6 +5,7 @@ import re
 import sqlite3
 import os.path
 
+
 # This function pull mitre json and send to local DB the new hash map
 def get_mitre_cti_hash_map():
     mitre_hash_technique = {}
@@ -49,15 +50,12 @@ def invert_mitre_hash_map(mitre_hash_map):
 def save_mitre_cti_to_db():
     conn = sqlite3.connect("Databases/Mitre_CTI.db")
     cur = conn.cursor()
-    create = "CREATE TABLE IF NOT EXISTS mitre_cti( event_id INT, ttp TEXT)";
-
+    create = "CREATE TABLE IF NOT EXISTS mitre_cti( event_id INT, ttp TEXT);"
     cur.execute(create)  # execute SQL commands
     conn.commit()
 
     mitre_cti_data = get_mitre_cti_hash_map()
-
-    mitre_cti_data = [(int(i), str(mitre_cti_data[i])) for i in mitre_cti_data]#--------------------------------------------------
-
+    mitre_cti_data = [(int(i), str(mitre_cti_data[i])) for i in mitre_cti_data]
     insert_command = "INSERT INTO mitre_cti VALUES(?,?);"
 
     cur.executemany(insert_command, mitre_cti_data)
@@ -67,7 +65,6 @@ def save_mitre_cti_to_db():
 
 # this function shwos the data inside Mitre_CTI.db
 def show_db():
-    print("kfir")
     conn = sqlite3.connect("Databases/Mitre_CTI.db")
     cur = conn.cursor()
     cur.execute("SELECT name FROM sqlite_master WHERE type='table';")  # show all the tables in the .db file
@@ -79,9 +76,8 @@ def show_db():
     print(names)
     print("Mitre_CTI.db_end______________________________________________________________________________")
 
-
+# TODO to remove to ' "['T1558.004']" ' and change it to -> 'T1558.004'
 def get_mitre_cti_hash_map_from_db():
-    print("Hen")
     mitreCTIHashMap = {}
     if not os.path.exists("Databases/Mitre_CTI.db"):  # or "Databases/Mitre_CTI.db"
         save_mitre_cti_to_db()
@@ -91,17 +87,15 @@ def get_mitre_cti_hash_map_from_db():
         sqlite_select_Query = "select event_id, ttp from mitre_cti"
         cursor.execute(sqlite_select_Query)
         record = cursor.fetchall()
-        #print(mitreCTIHashMap)
+        # print(mitreCTIHashMap)
         for rec in record:
             if rec[0] in mitreCTIHashMap.keys():
                 mitreCTIHashMap[int(rec[0])].append(rec[1])
             else:
-                #print(rec[0])
+                # print(rec[0])
                 mitreCTIHashMap[int(rec[0])] = [rec[1]]
         cursor.close()
         sqliteConnection.close()
         return mitreCTIHashMap
     except sqlite3.Error as error:
         print("error while connecting to sqlite ", error)
-
-
