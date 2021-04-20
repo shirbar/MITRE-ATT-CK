@@ -21,3 +21,4 @@ def get_user_xml_size(in_path):
     for filename in glob.glob(os.path.join(in_path, '*.xml')):
         size = os.stat(os.path.join(filename)).st_size
         return max(size / 100000, 50)
+

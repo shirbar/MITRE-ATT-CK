@@ -11,7 +11,7 @@ from Util.GetTTPs import get_ttp_from_event_ids
 from Methods.MITRECti import get_mitre_cti_hash_map
 import Methods.EventList as EventList
 import Methods.MITRECti as MITRECti
-
+import Methods.Malware as Malware
 
 Sg.theme('DarkBlue13')
 
@@ -183,8 +183,7 @@ while True:
             if checkBoxes[0]:
                 merge_hash_maps(mainHashMap, EventList.get_event_list_hash_map())
             if checkBoxes[1]:
-                pass
-                # TODO merge_hash_maps(mainHashMap, getMalwareArchaeologyHashMap())
+                merge_hash_maps(mainHashMap, Malware.get_Malware_Archaeology_HashMap_from_db())     ## TODO merge_hash_maps(mainHashMap, getMalwareArchaeologyHashMap())
             if checkBoxes[2]:
                 merge_hash_maps(mainHashMap, MITRECti.get_mitre_cti_hash_map_from_db())
 
@@ -223,7 +222,7 @@ while True:
         # resetting the check boxes to False.
         checkBoxes = False * 3
     elif event == 'MITRE_CTI_Update_Button':
-        Sg.popup_ok("TODO - update me")
+        MITRECti.save_mitre_cti_to_db()
     elif event == 'EventList_Update_Button':
         EventList.update_event_list_db()
         window.FindElement('EventList_Update_Button').Update(disabled=True)

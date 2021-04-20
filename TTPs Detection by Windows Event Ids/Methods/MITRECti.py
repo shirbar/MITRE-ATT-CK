@@ -47,6 +47,7 @@ def invert_mitre_hash_map(mitre_hash_map):
 
 
 # This function save the mitre cti tuple to Mitre_CTI.db file
+# Also this function make update for mitre cti db.
 def save_mitre_cti_to_db():
     conn = sqlite3.connect("Databases/Mitre_CTI.db")
     cur = conn.cursor()
@@ -60,7 +61,7 @@ def save_mitre_cti_to_db():
 
     cur.executemany(insert_command, mitre_cti_data)
     conn.commit()
-    show_db()
+    #show_db()
 
 
 # this function shwos the data inside Mitre_CTI.db
@@ -99,3 +100,5 @@ def get_mitre_cti_hash_map_from_db():
         return mitreCTIHashMap
     except sqlite3.Error as error:
         print("error while connecting to sqlite ", error)
+
+
