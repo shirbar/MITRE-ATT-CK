@@ -32,6 +32,7 @@ class MyTestCase(unittest.TestCase):
         except sqlite3.Error as error:
             print("error while connecting to sqlite ", error)
             self.assertTrue(False)
+
 """
     def test_mitre_cti_precision(self):
         event_id = 4624;

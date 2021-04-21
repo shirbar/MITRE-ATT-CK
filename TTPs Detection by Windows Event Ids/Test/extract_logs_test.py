@@ -6,7 +6,7 @@ import sys
 class MyTestCase(unittest.TestCase):
     def test_extract_logs_valid_folder(self):
         sys.path.append("../")
-        from Util.ExtractLogs import extract_event_ids
+        from ..Util.ExtractLogs import extract_event_ids
         event_ids = []
         self.assertFalse(extract_event_ids(event_ids, ""))
         event_ids = []

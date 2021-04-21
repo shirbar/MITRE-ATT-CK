@@ -82,7 +82,7 @@ methodUrls = ["https://raw.githubusercontent.com/miriamxyra/EventList/master/Eve
               "https://raw.githubusercontent.com/mitre/cti/master/enterprise-attack/enterprise-attack.json"]
 original_files = ["EventList", "Malware", "MITRE/CTI"]
 
-
+# This function check if there is a internet connection
 def check_connection():
     try:
         urllib.request.urlopen('https://www.google.com/', timeout=2)
@@ -91,7 +91,7 @@ def check_connection():
         print(e)
         return False
 
-
+# This function disable the update buttons if there no update available.
 def disable_buttons():
     global window
     window.FindElement('EventList_Update_Button').Update(disabled=True)
@@ -99,7 +99,7 @@ def disable_buttons():
     window.FindElement('MITRE_CTI_Update_Button').Update(disabled=True)
     window.Refresh()
 
-
+# This function enable the update buttons if there is a update available.
 def enable_button(j):
     global window
     if j == 0:
@@ -109,11 +109,12 @@ def enable_button(j):
     else:
         window.FindElement('MITRE_CTI_Update_Button').Update(disabled=False)
 
-
+# This function is a threaded function to extract event ids fro, the .xml file
 def extract_event_thread(user_ids):
     extract_event_ids(user_ids, values['-FOLDER-IN-'])
 
 
+# This function check if there is an update
 def update_checker():
     try:
         urllib.request.urlopen('https://www.google.com/', timeout=2)
@@ -143,7 +144,7 @@ extract_thread = Sg.Thread()
 updateThread = Sg.Thread(target=update_checker)
 updateThread.start()
 
-
+# This function terminate threads
 def terminate_thread(thread):
     global stopped
     if not thread.is_alive():
@@ -158,7 +159,7 @@ def terminate_thread(thread):
         ctypes.pythonapi.PyThreadState_SetAsyncExc(thread.ident, None)
         raise SystemError("PyThreadState_SetAsyncExc failed")
 
-
+# main loop
 while True:
     event, values = window.read()
     stopped = False
