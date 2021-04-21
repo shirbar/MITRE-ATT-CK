@@ -195,7 +195,7 @@ def if_in(in_event, out_event):
     else:
         return False
 
-print("\nMitre CTI measure: ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+print("\nMitre CTI measure: +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 get_mitre_cti_measure()
 print("\nEvent List +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 get_event_list_measure()
