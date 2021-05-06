@@ -82,6 +82,7 @@ methodUrls = ["https://raw.githubusercontent.com/miriamxyra/EventList/master/Eve
               "https://raw.githubusercontent.com/mitre/cti/master/enterprise-attack/enterprise-attack.json"]
 original_files = ["EventList", "Malware", "MITRE/CTI"]
 
+
 # This function check if there is a internet connection
 def check_connection():
     try:
@@ -91,6 +92,7 @@ def check_connection():
         print(e)
         return False
 
+
 # This function disable the update buttons if there no update available.
 def disable_buttons():
     global window
@@ -98,6 +100,7 @@ def disable_buttons():
     window.FindElement('MalwareArcheology_Update_Button').Update(disabled=True)
     window.FindElement('MITRE_CTI_Update_Button').Update(disabled=True)
     window.Refresh()
+
 
 # This function enable the update buttons if there is a update available.
 def enable_button(j):
@@ -108,6 +111,7 @@ def enable_button(j):
         window.FindElement('MalwareArcheology_Update_Button').Update(disabled=False)
     else:
         window.FindElement('MITRE_CTI_Update_Button').Update(disabled=False)
+
 
 # This function is a threaded function to extract event ids fro, the .xml file
 def extract_event_thread(user_ids):
@@ -144,6 +148,7 @@ extract_thread = Sg.Thread()
 updateThread = Sg.Thread(target=update_checker)
 updateThread.start()
 
+
 # This function terminate threads
 def terminate_thread(thread):
     global stopped
@@ -159,12 +164,14 @@ def terminate_thread(thread):
         ctypes.pythonapi.PyThreadState_SetAsyncExc(thread.ident, None)
         raise SystemError("PyThreadState_SetAsyncExc failed")
 
+
 # main loop
 while True:
     event, values = window.read()
     stopped = False
     # End program if user closes the window or
     if event in (None, 'Exit'):
+        terminate_thread(updateThread)
         break
     if event == 'SCAN':
         # checking if any of the check boxes are checked.
@@ -223,11 +230,17 @@ while True:
         # resetting the check boxes to False.
         checkBoxes = False * 3
     elif event == 'MITRE_CTI_Update_Button':
-        MITRECti.save_mitre_cti_to_db()
+        updaterThread = Sg.Thread(target=MITRECti.save_mitre_cti_to_db())
+        updaterThread.start()
+        window.FindElement('MITRE_CTI_Update_Button').Update(disabled=True)
+        Sg.popup_ok("    MITRECti DB has been updated.    ", title="Complete")
+
     elif event == 'EventList_Update_Button':
-        EventList.update_event_list_db()
+        updaterThread = Sg.Thread(target=EventList.update_event_list_db())
+        updaterThread.start()
         window.FindElement('EventList_Update_Button').Update(disabled=True)
-        Sg.popup_ok("    Event List DB has updated.    ", title="Done")
+        Sg.popup_ok("    Event List DB has been updated.    ", title="Complete")
+
     elif event == 'MalwareArcheology_Update_Button':
         Sg.popup_ok("TODO - update me")
 

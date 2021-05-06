@@ -8,16 +8,20 @@ import os.path
 mitre_hash_technique = {}
 pattern_dict = {}
 try:
+    print("op")
     pattern_file = open("mitre-cti-configuration.txt")
+    for line in pattern_file:
+        line = line.strip()
+        key_, value_ = line.split('\t')
+        print(str(key_) + " , " + str(value_))
+        pattern_dict[key_] = value_
+
+    print(pattern_dict)
 except:
-    print("error opening file mitre-cti-configuration.txt")
+    print("Error opening file mitre-cti-configuration.txt")
+    exit
 
-for line in pattern_file:
-    line = line.strip()
-    key_, value_ = line.split(':')
-    pattern_dict[key_] = value_
 
-print(pattern_dict)
 
 
 def search_pattern(text):
