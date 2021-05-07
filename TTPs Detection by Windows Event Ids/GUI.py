@@ -199,6 +199,7 @@ while True:
             # Those prints are only for testing
             print("The hash map selected by the user check boxes:")
             print(mainHashMap)
+
             # extracting the event ids from the files inside the folder
             user_event_ids = []
             extract_thread = Sg.Thread(target=extract_event_thread, args=(user_event_ids,))
