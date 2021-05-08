@@ -5,9 +5,9 @@ from tkinter import *
 import xlsxwriter
 import math
 
-tactics = ['Reconnaissance','Resource Development', 'Initial Access', 'Execution', 'Persistence',
-           'Privilege Escalation', 'Defense Evasion', 'Credential Access', 'Discovery',
-            'Lateral Movement', 'Collection', 'Command and Control',  'Exfiltration', 'Impact']
+tactics = ['reconnaissance','resource-development', 'initial-access', 'execution', 'persistence',
+           'privilege-escalation', 'defense-evasion', 'credential-access', 'discovery',
+            'lateral-movement', 'collection', 'command-and-control',  'exfiltration', 'impact']
 
 successRatesPerTactic = {}
 
@@ -34,6 +34,7 @@ def createOutputAsMatrix(TTPs):
         worksheet1.write(0, column, tactic)
         techniques =  get_tactic_techniques(tactic)
         techniquesNum = len(techniques)
+        print('numOfTechinqes:', techniquesNum)
         for technique in techniques:
             if techniques[technique] in TTPs:
                 worksheet1.write(row, column, technique,foundFormat)

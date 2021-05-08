@@ -2,9 +2,9 @@ from stix2 import Filter
 import requests
 from stix2 import MemoryStore
 
-tactics = ['Reconnaissance','Resource Development', 'Initial Access', 'Execution', 'Persistence',
-           'Privilege Escalation', 'Defense Evasion', 'Credential Access', 'Discovery',
-            'Lateral Movement', 'Collection', 'Command and Control',  'Exfiltration', 'Impact']
+tactics = ['reconnaissance','resource-development', 'initial-access', 'execution', 'persistence',
+           'privilege-escalation', 'defense-evasion', 'credential-access', 'discovery',
+            'lateral-movement', 'collection', 'command-and-control',  'exfiltration', 'impact']
 
 def get_data_from_branch(domain, branch="master"):
     stix_json = requests.get(f"https://raw.githubusercontent.com/mitre/cti/{branch}/{domain}/{domain}.json").json()
@@ -34,6 +34,7 @@ def get_technique_by_id(id):
 
 
 def get_tactic_techniques(tactic):
+    print('tactic is',tactic)
     res = src.query([
         Filter('type', '=', 'attack-pattern'),
         Filter('kill_chain_phases.phase_name', '=', tactic),
