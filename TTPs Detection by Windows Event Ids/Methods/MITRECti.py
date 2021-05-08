@@ -5,6 +5,7 @@ import re
 import sqlite3
 import os.path
 
+"""
 mitre_hash_technique = {}
 pattern_dict = {}
 try:
@@ -40,6 +41,7 @@ def search_pattern(text):
             else:
                 print("not in text")
 
+"""
 
 # This function pull mitre json and send to local DB the new hash map
 def get_mitre_cti_hash_map():
@@ -59,7 +61,7 @@ def get_mitre_cti_hash_map():
                     mitre_hash_technique[key].append(eventIds)
                 else:
                     mitre_hash_technique[key] = eventIds
-        search_pattern(i)
+        #search_pattern(i)
     print(mitre_hash_technique)
     return invert_mitre_hash_map(mitre_hash_technique)
     # return mitre_hash_technique
