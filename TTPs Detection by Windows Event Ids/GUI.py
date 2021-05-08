@@ -12,6 +12,7 @@ from Methods.MITRECti import get_mitre_cti_hash_map
 import Methods.EventList as EventList
 import Methods.MITRECti as MITRECti
 import Methods.Malware as Malware
+from Output import createOutputAsMatrix
 
 Sg.theme('DarkBlue13')
 
@@ -223,6 +224,7 @@ while True:
                 TTPs = get_ttp_from_event_ids(mainHashMap, user_event_ids)
                 print("\nThe end result TTPs:")
                 print(TTPs)
+                createOutputAsMatrix(TTPs)
             #else: Sg.popup_ok("Input Error", "The selected directory does not contain XML log file.")
 
         else:
