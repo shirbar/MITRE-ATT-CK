@@ -5,48 +5,45 @@ import re
 import sqlite3
 import os.path
 
-"""
-mitre_hash_technique = {}
-pattern_dict = {}
-try:
-    print("op")
-    pattern_file = open("mitre-cti-configuration.txt")
-    for line in pattern_file:
-        line = line.strip()
-        key_, value_ = line.split('\t')
-        print(str(key_) + " , " + str(value_))
-        pattern_dict[key_] = value_
-
-    print(pattern_dict)
-except:
-    print("Error opening file mitre-cti-configuration.txt")
-    exit
-
-
-
-
-def search_pattern(text):
-    global mitre_hash_technique
-    for pattern in pattern_dict.keys():
-        if 'x_mitre_detection' in text.keys():
-            if pattern in text['x_mitre_detection']:
-                print("in text")
-                key = text['external_references'][0]['external_id']
-                for value in pattern_dict[pattern].split(" "):
-                    print("value = " + str(value))
-                    if key in mitre_hash_technique.keys():
-                        mitre_hash_technique[key].append(value)
-                    else:
-                        mitre_hash_technique[key] = list(value)
-            else:
-                print("not in text")
-
-"""
 
 # This function pull mitre json and send to local DB the new hash map
 def get_mitre_cti_hash_map():
-    global mitre_hash_technique
+    def load_windows_event_ids():
+        try:
+            pattern_file = open("windows-event-ids.txt")
+            for line in pattern_file:
+                line = line.strip()
+                line_split = line.split('\t', maxsplit=2)
+                event_id_ = line_split[1]
+                header_ = line_split[2]
+                pattern_dict[header_] = event_id_
+            #print(pattern_dict)
+        except:
+            print("Error - failed to open the file windows-event-ids.txt")
+            exit()
+
+    def search_pattern(text):
+        for header in pattern_dict.keys():
+            if 'x_mitre_detection' in text.keys():
+                for word in str(header).split(' '):
+                    if word.lower() not in filter_words and word in text['x_mitre_detection']:
+                        technique = text['external_references'][0]['external_id']
+                        matched_words.append(word)
+                        # print(text['x_mitre_detection'])
+                        if technique in mitre_hash_technique.keys():
+                            mitre_hash_technique[technique].append(pattern_dict[header])
+                        else:
+                            mitre_hash_technique[technique] = list(pattern_dict[header])
+
+    pattern_dict = {}
     mitre_hash_technique = {}
+    matched_words = []
+    filter_words = (
+        "a", "or", "to", "the", "for", "an", "its", "and", "of", "in", "from", "was", "on", "it", "has", "have",
+        "been", "did", "not", "that", "with", "are", "as", "be", "this", "is", "now", "id", "get", "can", "no",
+        "if", "get", "by", "after", "into", "up", "some", "does", "more", "see", "being", "made", "when", "only",
+        "those", "but", "while", "other", "one", "per", "were", "will", "met", "could", "user", "users", "them", "they", "which",)
+    load_windows_event_ids()
     url = "https://raw.githubusercontent.com/mitre/cti/master/enterprise-attack/enterprise-attack.json"
     json_url = urlopen(url)
     data = json.loads(json_url.read())
@@ -61,8 +58,11 @@ def get_mitre_cti_hash_map():
                     mitre_hash_technique[key].append(eventIds)
                 else:
                     mitre_hash_technique[key] = eventIds
-        #search_pattern(i)
-    print(mitre_hash_technique)
+        search_pattern(i)
+    #print(mitre_hash_technique)
+    matched_words = set(matched_words)
+    print(matched_words)
+    print("inverting------")
     return invert_mitre_hash_map(mitre_hash_technique)
     # return mitre_hash_technique
 
@@ -79,10 +79,17 @@ def get_event_ids(description):
 
 def invert_mitre_hash_map(mitre_hash_map):
     new_dic = {}
+    print("original hash map:")
+    print(mitre_hash_map)
+    print("-------------\n\n")
     for k, v in mitre_hash_map.items():
         for x in v:
-            new_dic.setdefault(int(x), []).append(k)
+            if int(x) not in new_dic.keys():
+                new_dic[int(x)] = list(k)
+            elif k not in new_dic[int(x)]:
+                new_dic[int(x)].append(k)
 
+    print(new_dic)
     return new_dic
 
 
@@ -141,5 +148,3 @@ def get_mitre_cti_hash_map_from_db():
         return mitreCTIHashMap
     except sqlite3.Error as error:
         print("error while connecting to sqlite ", error)
-
-

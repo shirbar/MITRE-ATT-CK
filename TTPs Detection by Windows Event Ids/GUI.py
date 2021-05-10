@@ -3,6 +3,7 @@ import ctypes
 from time import sleep
 import PySimpleGUI as Sg
 import urllib.request
+import threading
 from datetime import datetime
 
 from Util.ExtractLogs import extract_event_ids, get_user_xml_size
@@ -142,11 +143,18 @@ def update_checker():
             window.FindElement(original_files[j]).Update("Offline")
 
 
+# update mitre cti db
+def update_mitre_cti_db():
+    MITRECti.save_mitre_cti_to_db()
+    window.FindElement(original_files[2]).Update(datetime.now().strftime("%d/%m/%y"), text_color="white")
+    #Sg.popup_ok("    MITRECti DB has been updated.    ", title="Complete")
+
+
 window = Sg.Window("TTP Detection", layout).Finalize()
 
 disable_buttons()
-extract_thread = Sg.Thread()
-updateThread = Sg.Thread(target=update_checker)
+extract_thread = threading.Thread()
+updateThread = threading.Thread(target=update_checker)
 updateThread.start()
 
 
@@ -203,7 +211,7 @@ while True:
 
             # extracting the event ids from the files inside the folder
             user_event_ids = []
-            extract_thread = Sg.Thread(target=extract_event_thread, args=(user_event_ids,))
+            extract_thread = threading.Thread(target=extract_event_thread, args=(user_event_ids,))
             extract_thread.start()
             # TODO search if I can get the length of the XML objects
 
@@ -233,13 +241,13 @@ while True:
         # resetting the check boxes to False.
         checkBoxes = False * 3
     elif event == 'MITRE_CTI_Update_Button':
-        updaterThread = Sg.Thread(target=MITRECti.save_mitre_cti_to_db())
+        updaterThread = threading.Thread(target=update_mitre_cti_db)
         updaterThread.start()
         window.FindElement('MITRE_CTI_Update_Button').Update(disabled=True)
-        Sg.popup_ok("    MITRECti DB has been updated.    ", title="Complete")
+        window.FindElement(original_files[2]).Update("Updating...", text_color='yellow')
 
     elif event == 'EventList_Update_Button':
-        updaterThread = Sg.Thread(target=EventList.update_event_list_db())
+        updaterThread = threading.Thread(target=EventList.update_event_list_db())
         updaterThread.start()
         window.FindElement('EventList_Update_Button').Update(disabled=True)
         Sg.popup_ok("    Event List DB has been updated.    ", title="Complete")
