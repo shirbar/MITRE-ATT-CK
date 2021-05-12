@@ -117,7 +117,7 @@ def enable_button(j):
 def extract_event_thread(user_ids):
     extract_event_ids(user_ids, values['-FOLDER-IN-'])
 
-
+"""
 # This function check if there is an update
 def update_checker():
     try:
@@ -139,6 +139,7 @@ def update_checker():
         print(e)
         for j in range(0, 3):
             window.FindElement(original_files[j]).Update("Offline")
+"""
 
 
 # update mitre cti db
@@ -154,10 +155,13 @@ def update_mitre_cti_db2():
 
 window = Sg.Window("TTP Detection", layout).Finalize()
 
-disable_buttons()
 extract_thread = threading.Thread()
+
+"""
+disable_buttons()
 updateThread = threading.Thread(target=update_checker)
 updateThread.start()
+"""
 
 
 # This function terminate threads
@@ -182,7 +186,7 @@ while True:
     stopped = False
     # End program if user closes the window or
     if event in (None, 'Exit'):
-        terminate_thread(updateThread)
+        # terminate_thread(updateThread)
         break
     if event == 'SCAN':
         # checking if any of the check boxes are checked.
@@ -202,7 +206,7 @@ while True:
             if checkBoxes[0]:
                 merge_hash_maps(mainHashMap, EventList.get_event_list_hash_map())
             if checkBoxes[1]:
-                merge_hash_maps(mainHashMap, Malware.get_Malware_Archaeology_HashMap_from_db())     ## TODO merge_hash_maps(mainHashMap, getMalwareArchaeologyHashMap())
+                merge_hash_maps(mainHashMap, Malware.get_Malware_Archaeology_HashMap_from_db())     # TODO merge_hash_maps(mainHashMap, getMalwareArchaeologyHashMap())
             if checkBoxes[2]:
                 merge_hash_maps(mainHashMap, MITRECti.get_mitre_cti_hash_map_from_db())
 
@@ -235,7 +239,7 @@ while True:
                 print("\nThe end result TTPs:")
                 print(TTPs)
                 createOutputAsMatrix(TTPs)
-            #else: Sg.popup_ok("Input Error", "The selected directory does not contain XML log file.")
+            # else: Sg.popup_ok("Input Error", "The selected directory does not contain XML log file.")
 
         else:
             Sg.popup_ok("Selection Error", "please select at least one check box method.")
