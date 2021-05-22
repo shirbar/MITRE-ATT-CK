@@ -5,15 +5,15 @@ from tkinter import *
 import xlsxwriter
 import math
 
-tactics = ['Reconnaissance','Resource Development', 'Initial Access', 'Execution', 'Persistence',
-           'Privilege Escalation', 'Defense Evasion', 'Credential Access', 'Discovery',
-            'Lateral Movement', 'Collection', 'Command and Control',  'Exfiltration', 'Impact']
+tactics = ['reconnaissance','resource-development', 'initial-access', 'execution', 'persistence',
+           'privilege-escalation', 'defense-evasion', 'credential-access', 'discovery',
+            'lateral-movement', 'collection', 'command-and-control',  'exfiltration', 'impact']
 
 successRatesPerTactic = {}
 
 def calculateSuccessOfTactic (tactic, techniquesNum,sucssesNum ):
-    result = math.floor(sucssesNum/techniquesNum) * 100
-    successRatesPerTactic[tactic] = result
+    result = (sucssesNum/techniquesNum) * 100
+    successRatesPerTactic[tactic] = round(result,2)
 
 
 def createOutputAsMatrix(TTPs):
