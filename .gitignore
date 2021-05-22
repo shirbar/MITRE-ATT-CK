@@ -5,5 +5,3 @@
 venv/*
 .idea/*
 TTPs Detection by Windows Event Ids/__pycache__/*
-Databases/*
-Mapping_Res_to_MitreAttack.xlsx
