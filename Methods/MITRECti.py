@@ -4,6 +4,20 @@ from urllib.request import urlopen
 import re
 import sqlite3
 import os.path
+#-------------
+import os, time
+import http.client
+import sys
+import pickle
+from datetime import datetime
+import smtplib
+from email.mime.text import MIMEText
+import yaml
+## importing socket module
+import socket
+
+#from git import Repo
+
 
 
 # This function pull mitre json and send to local DB the new hash map
@@ -108,6 +122,21 @@ def save_mitre_cti_to_db():
 
     cur.executemany(insert_command, mitre_cti_data)
     conn.commit()
+
+    #save to db the lest modify date of the ttps.
+    create = "CREATE TABLE IF NOT EXISTS mitre_cti_last_modify(ttp TEXT, date TEXT);"
+    cur.execute(create)  # execute SQL commands
+    conn.commit()
+
+    mitre_cti_last_modify = get_lest_modified_date()
+    #print_check(mitre_cti_last_modify)
+    mitre_cti_last_modify = [(str(i), str(mitre_cti_last_modify[i])) for i in mitre_cti_last_modify]
+    #print_check(mitre_cti_last_modify)
+    insert_command = "INSERT INTO mitre_cti_last_modify VALUES(?,?);"
+
+
+    cur.executemany(insert_command, mitre_cti_last_modify)
+    conn.commit()
     # show_db()
 
 
@@ -150,7 +179,79 @@ def get_mitre_cti_hash_map_from_db():
         print("error while connecting to sqlite ", error)
 
 
+def get_modify_date_from_db():
+    mitre_modify_hash_map = {}
+    if not os.path.exists("Databases/Mitre_CTI.db"):  # or "Databases/Mitre_CTI.db"
+        save_mitre_cti_to_db()
+    try:
+        sqliteConnection = sqlite3.connect("Databases/Mitre_CTI.db")
+        cursor = sqliteConnection.cursor()
+        sqlite_select_Query = "select ttp, date from mitre_cti_last_modify"
+        cursor.execute(sqlite_select_Query)
+        record = cursor.fetchall()
+        # print(mitreCTIHashMap)
+        for rec in record:
+            if rec[0] in mitre_modify_hash_map.keys():
+                mitre_modify_hash_map[rec[0]].append(rec[1])
+            else:
+                # print(rec[0])
+                mitre_modify_hash_map[rec[0]] = [rec[1]]
+        cursor.close()
+        sqliteConnection.close()
+        return mitre_modify_hash_map
+    except sqlite3.Error as error:
+        print("error while connecting to sqlite ", error)
+
 def check_for_update():
-    print("something")
-    save_mitre_cti_to_db()
-    print("done")
+
+    count = 0
+    # get last modified data from MITRE CTI github
+    modified_hash_map_from_mitre_cti = get_lest_modified_date()
+
+    # get last modified data from MITRE CTI local db
+    modified_hash_map_from_db = get_modify_date_from_db()
+
+    for i in modified_hash_map_from_db:
+        if i in modified_hash_map_from_mitre_cti:
+            count += 1
+        else:
+            return False
+
+    return True
+
+
+def get_lest_modified_date():
+    modified_hash_map = {}
+
+    url = "https://raw.githubusercontent.com/mitre/cti/master/enterprise-attack/enterprise-attack.json"
+    json_url = urlopen(url)
+    data = json.loads(json_url.read())
+
+    for i in data['objects']:
+        if 'modified' in i:
+            if 'external_references' in i:
+                if 'external_id' in i['external_references'][0]:
+                    date = i['modified']
+                    key = i['external_references'][0]['external_id']
+                    if key in modified_hash_map.keys():
+                        modified_hash_map[key].append(date)
+                    else:
+                        modified_hash_map[key] = []
+                        modified_hash_map[key].append(date)
+
+                    #print("TTTTTTrue")
+
+    #print(modified_hash_map)
+    return modified_hash_map
+
+
+def print_check(x):
+    print("---------------------------------------------------------------------------------------------------")
+    print("_+_++_++_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_++_+_+_+_+_+_+_+_+_++_+_+_+_+_+_+_")
+    print("_+_++_++_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_++_+_+_+_+_+_+_+_+_++_+_+_+_+_+_+_")
+    print("_+_++_++_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_++_+_+_+_+_+_+_+_+_++_+_+_+_+_+_+_")
+    print(x)
+    print("_+_++_++_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_++_+_+_+_+_+_+_+_+_++_+_+_+_+_+_+_")
+    print("_+_++_++_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_++_+_+_+_+_+_+_+_+_++_+_+_+_+_+_+_")
+    print("_+_++_++_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_++_+_+_+_+_+_+_+_+_++_+_+_+_+_+_+_")
+    print("---------------------------------------------------------------------------------------------------")

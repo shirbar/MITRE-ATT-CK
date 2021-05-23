@@ -150,7 +150,8 @@ def update_mitre_cti_db():
 
 
 def update_mitre_cti_db2():
-    MITRECti.check_for_update()
+    #MITRECti.save_mitre_cti_to_db()
+    print(MITRECti.check_for_update())
 
 
 window = Sg.Window("TTP Detection", layout).Finalize()
