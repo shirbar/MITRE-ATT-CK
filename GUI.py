@@ -275,7 +275,8 @@ while True:
         Sg.popup_ok("    Event List DB has been updated.    ", title="Complete")
 
     elif event == 'MalwareArcheology_Update_Button':
-        Sg.popup_ok("TODO - update me")
+        print(Malware.Check_for_update_Malware())
+        #Sg.popup_ok("TODO - update me")
 
 window.close()
 

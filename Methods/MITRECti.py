@@ -44,7 +44,7 @@ def get_mitre_cti_hash_map():
                         technique = text['external_references'][0]['external_id']
                         matched_words.append(word)
                         # print(text['x_mitre_detection'])
-                        if technique in mitre_hash_technique.keys():
+                        if (len(technique) > 1) and (technique in mitre_hash_technique.keys()):
                             mitre_hash_technique[technique].append(pattern_dict[header])
                         else:
                             mitre_hash_technique[technique] = list(pattern_dict[header])
@@ -203,6 +203,8 @@ def get_modify_date_from_db():
     except sqlite3.Error as error:
         print("error while connecting to sqlite ", error)
 
+# this function compere the old list from the db with new one from the internet
+# return true if update is needed else return false
 def check_for_update():
 
     count = 0
@@ -213,12 +215,10 @@ def check_for_update():
     modified_hash_map_from_db = get_modify_date_from_db()
 
     for i in modified_hash_map_from_db:
-        if i in modified_hash_map_from_mitre_cti:
-            count += 1
-        else:
-            return False
+        if i not in modified_hash_map_from_mitre_cti:
+            return True
 
-    return True
+    return False
 
 
 def get_lest_modified_date():
