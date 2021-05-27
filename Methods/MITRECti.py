@@ -174,6 +174,7 @@ def get_mitre_cti_hash_map_from_db():
                 mitreCTIHashMap[int(rec[0])] = [rec[1]]
         cursor.close()
         sqliteConnection.close()
+
         return mitreCTIHashMap
     except sqlite3.Error as error:
         print("error while connecting to sqlite ", error)
@@ -255,3 +256,4 @@ def print_check(x):
     print("_+_++_++_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_++_+_+_+_+_+_+_+_+_++_+_+_+_+_+_+_")
     print("_+_++_++_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_++_+_+_+_+_+_+_+_+_++_+_+_+_+_+_+_")
     print("---------------------------------------------------------------------------------------------------")
+

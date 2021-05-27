@@ -163,7 +163,20 @@ disable_buttons()
 updateThread = threading.Thread(target=update_checker)
 updateThread.start()
 """
+#############################################################################################################################
+# change the end result form
+def convert_output(list):
+    newList = []
 
+    for item in list:
+        if len(item) > 1 and item[0] is not 'T':
+            item = item.split("'")
+            for x in item:
+                if ("[" not in x) and ("]" not in x) and ("'" not in x) and ("," not in x):
+                    newList.append(x)
+        else:
+            newList.append(item)
+    return set(newList)
 
 # This function terminate threads
 def terminate_thread(thread):
@@ -238,7 +251,8 @@ while True:
                 print(user_event_ids)
                 TTPs = get_ttp_from_event_ids(mainHashMap, user_event_ids)
                 print("\nThe end result TTPs:")
-                print(TTPs)
+                print(convert_output(TTPs)) ######
+                #print(TTPs)
                 createOutputAsMatrix(TTPs)
             # else: Sg.popup_ok("Input Error", "The selected directory does not contain XML log file.")
 
@@ -264,3 +278,5 @@ while True:
         Sg.popup_ok("TODO - update me")
 
 window.close()
+
+
