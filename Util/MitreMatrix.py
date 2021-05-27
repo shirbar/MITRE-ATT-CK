@@ -34,7 +34,6 @@ def get_technique_by_id(id):
 
 
 def get_tactic_techniques(tactic):
-    print('tactic is',tactic)
     res = src.query([
         Filter('type', '=', 'attack-pattern'),
         Filter('kill_chain_phases.phase_name', '=', tactic),
