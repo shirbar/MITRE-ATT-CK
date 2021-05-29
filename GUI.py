@@ -4,7 +4,7 @@ import PySimpleGUI as Sg
 import urllib.request
 import threading
 from datetime import datetime
-
+import itertools
 from Util.ExtractLogs import extract_event_ids, get_user_xml_size
 from Util.MergeHashMaps import merge_hash_maps
 from Util.GetTTPs import get_ttp_from_event_ids
@@ -12,6 +12,7 @@ import Methods.EventList as EventList
 import Methods.MITRECti as MITRECti
 import Methods.Malware as Malware
 from Output import createOutputAsMatrix
+from collections.abc import Iterable
 
 Sg.theme('DarkBlue13')
 
@@ -164,6 +165,15 @@ updateThread.start()
 """
 
 
+new_list = []
+
+def my_fun(temp_list):
+    for ele in temp_list:
+        if type(ele) == list:
+            my_fun(ele)
+        else:
+            new_list.append(ele)
+
 # This function terminate threads
 def terminate_thread(thread):
     global stopped
@@ -206,7 +216,7 @@ while True:
             if checkBoxes[0]:
                 merge_hash_maps(mainHashMap, EventList.get_event_list_hash_map())
             if checkBoxes[1]:
-                merge_hash_maps(mainHashMap, Malware.get_Malware_Archaeology_HashMap_from_db())     # TODO merge_hash_maps(mainHashMap, getMalwareArchaeologyHashMap())
+                merge_hash_maps(mainHashMap, Malware.get_Malware_Archaeology_HashMap_from_db())     # TODO merge_hash_maps(mainHashMap, getMalwareArchaeologyHashMap()
             if checkBoxes[2]:
                 merge_hash_maps(mainHashMap, MITRECti.get_mitre_cti_hash_map_from_db())
 
@@ -236,9 +246,12 @@ while True:
                 print("\nThe user event ids:")
                 print(user_event_ids)
                 TTPs = get_ttp_from_event_ids(mainHashMap, user_event_ids)
+                my_fun(TTPs)
+
+
                 print("\nThe end result TTPs:")
-                print(TTPs)
-                createOutputAsMatrix(TTPs)
+                print(new_list)
+                createOutputAsMatrix(new_list)
             # else: Sg.popup_ok("Input Error", "The selected directory does not contain XML log file.")
 
         else:
