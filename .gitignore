@@ -7,3 +7,7 @@ TTPs Detection by Windows Event Ids/__pycache__/*
 Databases/*.db
 Mapping_Res_to_MitreAttack.xlsx
 .TestLogsFolder/*.xml
+*.db
+Mapping_Res_to_MitreAttack.xlsx
+*.xml
+*.xml

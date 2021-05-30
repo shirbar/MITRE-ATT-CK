@@ -5,6 +5,8 @@ import os.path
 
 
 def update_event_list_db():
+    if os.path.exists("Databases/EventList.db"):
+        os.remove("Databases/EventList.db")
     url = "https://raw.githubusercontent.com/miriamxyra/EventList/master/EventList/internal/data/EventList.db"
     fileName, headers = urllib.request.urlretrieve(url, 'Databases/EventList.db')
     with open("Util/MethodsDate.json", "r") as jsonFile:

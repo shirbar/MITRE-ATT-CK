@@ -1,11 +1,13 @@
 import json
 import ctypes
+import time
+
 import PySimpleGUI as Sg
 import urllib.request
 import threading
 from datetime import datetime
 
-from Util.ExtractLogs import extract_event_ids, get_user_xml_size
+from Util.ExtractLogs import extract_event_ids
 from Util.MergeHashMaps import merge_hash_maps
 from Util.GetTTPs import get_ttp_from_event_ids
 import Methods.EventList as EventList
@@ -34,8 +36,11 @@ dirOut_list = [
 
 button_list = [
     [
-        Sg.Button("SCAN"),
+        Sg.Button("SCAN", key='Scan_Button'),
         Sg.Exit(),
+        Sg.Text("\t\t", key="Status", size=(50, 1), text_color='yellow'),
+        Sg.Text("", key="Files", size=(2, 1), text_color='yellow'),
+        Sg.Text("", key="Percent", size=(4, 1), text_color='yellow'),
     ]
 ]
 # check box layout
@@ -94,11 +99,19 @@ def check_connection():
 
 
 # This function disable the update buttons if there no update available.
-def disable_buttons():
+# method values: (0: EventList, 1: Malware Archeology, 2: MITRE/CTI, 3: all of the methods)
+def disable_buttons(method):
     global window
-    window.FindElement('EventList_Update_Button').Update(disabled=True)
-    window.FindElement('MalwareArcheology_Update_Button').Update(disabled=True)
-    window.FindElement('MITRE_CTI_Update_Button').Update(disabled=True)
+    if method == 0:
+        window.FindElement('EventList_Update_Button').Update(disabled=True)
+    elif method == 1:
+        window.FindElement('MalwareArcheology_Update_Button').Update(disabled=True)
+    elif method == 2:
+        window.FindElement('MITRE_CTI_Update_Button').Update(disabled=True)
+    else :
+        window.FindElement('EventList_Update_Button').Update(disabled=True)
+        window.FindElement('MalwareArcheology_Update_Button').Update(disabled=True)
+        window.FindElement('MITRE_CTI_Update_Button').Update(disabled=True)
     window.Refresh()
 
 
@@ -115,72 +128,93 @@ def enable_button(j):
 
 # This function is a threaded function to extract event ids fro, the .xml file
 def extract_event_thread(user_ids):
-    extract_event_ids(user_ids, values['-FOLDER-IN-'])
+    global window
+    start_time = time.time()
+    window.FindElement("Status").Update("Extracting event ids from " + str(values['-FOLDER-IN-']))
+    window.FindElement("Files").Update("0/0")
+    window.FindElement("Percent").Update("0%")
+    extract_event_ids(user_ids, values['-FOLDER-IN-'], window)
+    window.FindElement("Status").Update("Searching for TTPs...")
+    user_ids = set(user_ids)
+    print("\nThe user event ids:")
+    print(user_ids)
+    TTPs = get_ttp_from_event_ids(mainHashMap, user_ids)
+    print("\nThe end result TTPs:")
+    print(convert_output(TTPs))
+    result_time = (time.time() - start_time)
+    window.FindElement("Status").Update("\t\tFinished in " + str("{:.2f}".format(result_time)) + " seconds.")
+    window.FindElement('Scan_Button').Update(disabled=False)
+    window.Refresh()
+    createOutputAsMatrix(convert_output(TTPs))
 
-"""
+
+
 # This function check if there is an update
 def update_checker():
     try:
-        urllib.request.urlopen('https://www.google.com/', timeout=2)
-        global extract_thread
-        with open("Util/MethodsDate.json") as json_file:
-            methodsSize = json.load(json_file)
-            for j in range(0, 3):
-                window.FindElement(original_files[j]).Update("Checking for update...")
-                fileName, headers = urllib.request.urlretrieve(methodUrls[j])
-                if extract_thread.is_alive():
-                    extract_thread.join()
-                if methodsSize[original_files[j]] != headers['Content-Length']:
-                    enable_button(j)
-                    window.FindElement(original_files[j]).Update("Expired", text_color='red')
-                else:
-                    window.FindElement(original_files[j]).Update(datetime.now().strftime("%d/%m/%y"), text_color="white")
+        if urllib.request.urlopen('https://www.google.com/', timeout=2):
+            global extract_thread
+            with open("Util/MethodsDate.json") as json_file:
+                methodsSize = json.load(json_file)
+                for j in range(0, 3):
+                    window.FindElement(original_files[j]).Update("Checking for update...")
+                    if extract_thread.is_alive():
+                        extract_thread.join()
+                    if check_for_update(j):
+                        enable_button(j)
+                        window.FindElement(original_files[j]).Update("Expired", text_color='red')
+                    else:
+                        window.FindElement(original_files[j]).Update("Up to Date: " + str(datetime.now().strftime("%d/%m/%y")), text_color="white")
+        else:
+            Sg.popup_notify("No internet Connection, Couldn't check for updates.", title="Warning")
     except Exception as e:
         print(e)
         for j in range(0, 3):
-            window.FindElement(original_files[j]).Update("Offline")
-"""
+            window.FindElement(original_files[j]).Update("Update Error")
 
 
-# update mitre cti db
+def check_for_update(method):
+    # method values: (0: EventList, 1: Malware Archeology, 2: MITRE/CTI)
+    if method == 0:
+        return EventList.check_for_update()
+    elif method == 1:
+        return Malware.Check_for_update_Malware()
+    else:
+        return MITRECti.check_for_update()
+
+
+def update_event_list_db():
+    EventList.update_event_list_db()
+    window.FindElement(original_files[0]).Update(
+        "Up to Date: " + str(datetime.now().strftime("%d/%m/%y")), text_color="white")
+
+
+def update_malware_db():
+    Malware.get_malware_hash_map()
+    window.FindElement(original_files[1]).Update(
+        "Up to Date: " + str(datetime.now().strftime("%d/%m/%y")), text_color="white")
+
+
 def update_mitre_cti_db():
     MITRECti.save_mitre_cti_to_db()
-    window.FindElement(original_files[2]).Update(datetime.now().strftime("%d/%m/%y"), text_color="white")
-    #Sg.popup_ok("    MITRECti DB has been updated.    ", title="Complete")
-
-
-def check_update_mitre_cti_db():
-    print(MITRECti.check_for_update())
-    if (MITRECti.check_for_update()):
-        MITRECti.save_mitre_cti_to_db()
-        window.popup_ok("    MITRECti DB is up to date.    ", title="Update")
-    else:
-        window.popup_ok("    MITRECti DB has been updated.    ", title="Update")
-        window.FindElement(original_files[2]).Update("Up to date.", text_color='white')
-
-
-
-def check_update_event_list_db():
-    print(EventList.check_for_update())
-    window.popup_ok("    Event DB has been updated.    ", title="Complete")
-
+    window.FindElement(original_files[2]).Update(
+        "Up to Date: " + str(datetime.now().strftime("%d/%m/%y")), text_color="white")
 
 
 window = Sg.Window("TTP Detection", layout).Finalize()
-
 extract_thread = threading.Thread()
 
-"""
-disable_buttons()
-updateThread = threading.Thread(target=update_checker)
-updateThread.start()
-"""
+disable_buttons(3)
+check_update_thread = threading.Thread(target=update_checker)
+check_update_thread.start()
+
+
 #############################################################################################################################
 # change the end result form
-def convert_output(list):
+def convert_output(list_):
     newList = []
 
-    for item in list:
+    for item in list_:
         if len(item) > 1 and item[0] != 'T':
             item = item.split("'")
             for x in item:
@@ -189,6 +223,7 @@ def convert_output(list):
         else:
             newList.append(item)
     return set(newList)
+
 
 # This function terminate threads
 def terminate_thread(thread):
@@ -212,9 +247,9 @@ while True:
     stopped = False
     # End program if user closes the window or
     if event in (None, 'Exit'):
-        # terminate_thread(updateThread)
+        terminate_thread(check_update_thread)
         break
-    if event == 'SCAN':
+    if event == 'Scan_Button':
         # checking if any of the check boxes are checked.
         checkBoxes = [False] * 3
         if window.FindElement('EventListCB').Get():
@@ -242,12 +277,12 @@ while True:
             print(mainHashMap)
 
             # extracting the event ids from the files inside the folder
+            window.FindElement('Scan_Button').Update(disabled=True)
             user_event_ids = []
             extract_thread = threading.Thread(target=extract_event_thread, args=(user_event_ids,))
             extract_thread.start()
-            # TODO search if I can get the length of the XML objects
 
-            size = int(get_user_xml_size(values['-FOLDER-IN-']))
+            """
             for i in range(1, size + 1):
                 progress_event = Sg.one_line_progress_meter("Progress bar", i, size, "key",
                                                             "retrieving data from " + str(values['-FOLDER-IN-']))
@@ -255,6 +290,7 @@ while True:
                     terminate_thread(extract_thread)
                     break
 
+            output_thread = threading.Thread(target=output_result, args=)
             extract_thread.join()
             if not stopped:
                 user_event_ids = set(user_event_ids)
@@ -266,7 +302,7 @@ while True:
                 print(convert_output(TTPs)) ######
                 createOutputAsMatrix(convert_output(TTPs))
             # else: Sg.popup_ok("Input Error", "The selected directory does not contain XML log file.")
-
+            """
         else:
             Sg.popup_ok("Selection Error", "please select at least one check box method.")
 
@@ -274,21 +310,23 @@ while True:
         checkBoxes = False * 3
 
     elif event == 'EventList_Update_Button':
-        updaterThread = threading.Thread(target=check_update_event_list_db)
-        updaterThread.start()
+        event_thread = threading.Thread(target=update_event_list_db)
+        event_thread.start()
         window.FindElement(original_files[0]).Update("Updating...", text_color='yellow')
-        window.FindElement('EventList_Update_Button').Update(disabled=True)
-        Sg.popup_ok("    Event List DB has been updated.    ", title="Complete")
+        disable_buttons(0)
+
     elif event == 'MalwareArcheology_Update_Button':
-        updaterThread = threading.Thread(target=Malware.Check_for_update_Malware())
-        updaterThread.start()
+        malware_thread = threading.Thread(target=update_malware_db)
+        malware_thread.start()
         window.FindElement(original_files[1]).Update("Updating...", text_color='yellow')
+        disable_buttons(1)
+
     elif event == 'MITRE_CTI_Update_Button':
-        # updaterThread = threading.Thread(target=update_mitre_cti_db)
-        updaterThread = threading.Thread(target=check_update_mitre_cti_db)
-        updaterThread.start()
-        window.FindElement('MITRE_CTI_Update_Button').Update(disabled=True)
+        mitre_thread = threading.Thread(target=update_mitre_cti_db)
+        mitre_thread.start()
         window.FindElement(original_files[2]).Update("Updating...", text_color='yellow')
+        disable_buttons(2)
+
 
 
 window.close()
