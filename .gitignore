@@ -5,3 +5,4 @@
 venv/*
 .idea/*
 TTPs Detection by Windows Event Ids/__pycache__/*
+*.xml
