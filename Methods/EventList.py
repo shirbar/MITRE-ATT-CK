@@ -62,3 +62,7 @@ def invert_hash_map(mitre_hash_map):
             new_dic.setdefault(str(x), []).append(k)
 
     return new_dic
+
+
+def check_for_update():
+    return True
