@@ -3,7 +3,6 @@ import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 import xlsxwriter
 import math
-import pandas as pd
 import xlrd
 from tkinter.ttk import Notebook,Entry
 from tkinter import Scale, Tk, Frame, Label, Button, WORD

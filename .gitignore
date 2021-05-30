@@ -1,8 +1,9 @@
 
 *.pyc
-.idea/workspace.xml
 .venv
 venv/*
 .idea/*
 TTPs Detection by Windows Event Ids/__pycache__/*
-*.xml
+Databases/*.db
+Mapping_Res_to_MitreAttack.xlsx
+.TestLogsFolder/*.xml
