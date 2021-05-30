@@ -206,8 +206,6 @@ def get_modify_date_from_db():
 # this function compere the old list from the db with new one from the internet
 # return true if update is needed else return false
 def check_for_update():
-
-    count = 0
     # get last modified data from MITRE CTI github
     modified_hash_map_from_mitre_cti = get_lest_modified_date()
 
@@ -240,9 +238,6 @@ def get_lest_modified_date():
                         modified_hash_map[key] = []
                         modified_hash_map[key].append(date)
 
-                    #print("TTTTTTrue")
-
-    #print(modified_hash_map)
     return modified_hash_map
 
 
