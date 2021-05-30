@@ -108,9 +108,16 @@ def invert_mitre_hash_map(mitre_hash_map):
 
 # This function save the mitre cti tuple to Mitre_CTI.db file
 # Also this function make update for mitre cti db.
+# Also save to db the lest modify date of the ttps.
 def save_mitre_cti_to_db():
+
     conn = sqlite3.connect("Databases/Mitre_CTI.db")
     cur = conn.cursor()
+
+    if os.path.exists("Databases/Mitre_CTI.db"):
+        drop = "DROP TABLE IF EXISTS mitre_cti"
+        cur.execute(drop)
+
     create = "CREATE TABLE IF NOT EXISTS mitre_cti( event_id INT, ttp TEXT);"
     cur.execute(create)  # execute SQL commands
     conn.commit()
@@ -123,6 +130,10 @@ def save_mitre_cti_to_db():
     conn.commit()
 
     #save to db the lest modify date of the ttps.
+    if os.path.exists("Databases/Mitre_CTI.db"):
+        drop = "DROP TABLE IF EXISTS mitre_cti_last_modify"
+        cur.execute(drop)
+
     create = "CREATE TABLE IF NOT EXISTS mitre_cti_last_modify(ttp TEXT, date TEXT);"
     cur.execute(create)  # execute SQL commands
     conn.commit()
