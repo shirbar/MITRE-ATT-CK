@@ -82,11 +82,7 @@ layout = [
     [Sg.Column(button_list)],
 ]
 
-methodUrls = ["https://raw.githubusercontent.com/miriamxyra/EventList/master/EventList/internal/data/EventList.db",
-              "https://raw.githubusercontent.com/miriamxyra/EventList/master/EventList/internal/data/EventList.db",
-              "https://raw.githubusercontent.com/mitre/cti/master/enterprise-attack/enterprise-attack.json"]
 original_files = ["EventList", "Malware", "MITRE/CTI"]
-
 
 # This function check if there is a internet connection
 def check_connection():
@@ -130,11 +126,10 @@ def enable_button(j):
 def extract_event_thread(user_ids):
     global window
     start_time = time.time()
-    window.FindElement("Status").Update("Extracting event ids from " + str(values['-FOLDER-IN-']))
+    window.FindElement("Status").Update("Parsing the XML files...")
     window.FindElement("Files").Update("0/0")
     window.FindElement("Percent").Update("0%")
     extract_event_ids(user_ids, values['-FOLDER-IN-'], window)
-    window.FindElement("Status").Update("Searching for TTPs...")
     user_ids = set(user_ids)
     print("\nThe user event ids:")
     print(user_ids)
@@ -148,23 +143,17 @@ def extract_event_thread(user_ids):
     createOutputAsMatrix(convert_output(TTPs))
 
 
-
 # This function check if there is an update
 def update_checker():
     try:
         if urllib.request.urlopen('https://www.google.com/', timeout=2):
-            global extract_thread
-            with open("Util/MethodsDate.json") as json_file:
-                methodsSize = json.load(json_file)
-                for j in range(0, 3):
-                    window.FindElement(original_files[j]).Update("Checking for update...")
-                    if extract_thread.is_alive():
-                        extract_thread.join()
-                    if check_for_update(j):
-                        enable_button(j)
-                        window.FindElement(original_files[j]).Update("Expired", text_color='red')
-                    else:
-                        window.FindElement(original_files[j]).Update("Up to Date: " + str(datetime.now().strftime("%d/%m/%y")), text_color="white")
+            for j in range(0, 3):
+                window.FindElement(original_files[j]).Update("Checking for update...")
+                if check_for_update(j):
+                    enable_button(j)
+                    window.FindElement(original_files[j]).Update("Expired", text_color='red')
+                else:
+                    window.FindElement(original_files[j]).Update("Up to Date: " + str(datetime.now().strftime("%d/%m/%y")), text_color="white")
         else:
             Sg.popup_notify("No internet Connection, Couldn't check for updates.", title="Warning")
     except Exception as e:
@@ -173,12 +162,12 @@ def update_checker():
             window.FindElement(original_files[j]).Update("Update Error")
 
 
+# method values: (0: EventList, 1: Malware Archeology, 2: MITRE/CTI)
 def check_for_update(method):
-    # method values: (0: EventList, 1: Malware Archeology, 2: MITRE/CTI)
     if method == 0:
         return EventList.check_for_update()
     elif method == 1:
-        return Malware.Check_for_update_Malware()
+        return Malware.check_for_update()
     else:
         return MITRECti.check_for_update()
 
@@ -267,7 +256,7 @@ while True:
             if checkBoxes[0]:
                 merge_hash_maps(mainHashMap, EventList.get_event_list_hash_map())
             if checkBoxes[1]:
-                merge_hash_maps(mainHashMap, Malware.get_Malware_Archaeology_HashMap_from_db())     # TODO merge_hash_maps(mainHashMap, getMalwareArchaeologyHashMap())
+                merge_hash_maps(mainHashMap, Malware.get_malware_archaeology_hashmap_from_db())     # TODO merge_hash_maps(mainHashMap, getMalwareArchaeologyHashMap())
             if checkBoxes[2]:
                 merge_hash_maps(mainHashMap, MITRECti.get_mitre_cti_hash_map_from_db())
 

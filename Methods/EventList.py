@@ -1,4 +1,3 @@
-import json
 import urllib.request
 import sqlite3
 import os.path
@@ -8,12 +7,7 @@ def update_event_list_db():
     if os.path.exists("Databases/EventList.db"):
         os.remove("Databases/EventList.db")
     url = "https://raw.githubusercontent.com/miriamxyra/EventList/master/EventList/internal/data/EventList.db"
-    fileName, headers = urllib.request.urlretrieve(url, 'Databases/EventList.db')
-    with open("Util/MethodsDate.json", "r") as jsonFile:
-        data = json.load(jsonFile)
-    data["EventList"] = headers['Content-Length']
-    with open("Util/MethodsDate.json", "w") as jsonFile:
-        json.dump(data, jsonFile)
+    urllib.request.urlretrieve(url, 'Databases/EventList.db')
 
 
 def get_event_list_hash_map():
@@ -38,11 +32,8 @@ def get_event_list_hash_map():
     except sqlite3.Error as error:
         print("error while connecting to sqlite ", error)
 
-#
+
 def get_event_list_hash_map_for_check():
-
-
-
     EventListHashMap = {}
     if not os.path.exists("Databases/EventList2.db"):
         update_event_list_db()
@@ -63,6 +54,7 @@ def get_event_list_hash_map_for_check():
         return EventListHashMap  # invert_hash_map(EventListHashMap)
     except sqlite3.Error as error:
         print("error while connecting to sqlite ", error)
+
 
 def show_db():
     conn = sqlite3.connect("Databases/EventList.db")
@@ -96,18 +88,15 @@ def check_for_update():
     if os.path.exists("Databases/EventList2.db"):
         os.remove("Databases/EventList2.db")
     url = "https://raw.githubusercontent.com/miriamxyra/EventList/master/EventList/internal/data/EventList.db"
-    fileName, headers = urllib.request.urlretrieve(url, 'Databases/EventList2.db')
+    urllib.request.urlretrieve(url, 'Databases/EventList2.db')
 
     # get the old and the new list
     event_list_from_db = get_event_list_hash_map()
     event_list_from_git = get_event_list_hash_map_for_check()
     os.remove("Databases/EventList2.db")
 
-    # compere the lists to check if the db was chanced
+    # compere the lists to check if the db has changed
     for item in event_list_from_db:
         if item not in event_list_from_git:
             return True
-
     return False
-
-
