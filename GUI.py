@@ -1,4 +1,3 @@
-import json
 import ctypes
 import os
 import shutil
@@ -18,6 +17,8 @@ import Methods.Malware as Malware
 from Output import createOutputAsMatrix
 
 Sg.theme('DarkBlue13')
+MAX_THREADS = os.cpu_count()*5
+
 
 dirIn_list = [
     [
@@ -36,12 +37,21 @@ dirOut_list = [
     ],
 ]
 
+thread_list = [
+    [
+        Sg.Text("Number of Threads:\t"),
+        Sg.In(size=(3, 1), enable_events=True, key='treads_key', default_text="2"),
+        Sg.Text("/  " + str(MAX_THREADS)),
+        Sg.Button("Max", key='max_threads'),
+    ],
+]
+
 button_list = [
     [
         Sg.Button("SCAN", key='Scan_Button'),
         Sg.Exit(),
-        Sg.Text("\t\t", key="Status", size=(50, 1), text_color='yellow'),
-        Sg.Text("", key="Files", size=(2, 1), text_color='yellow'),
+        Sg.Text("\t\t", key="Status", size=(45, 1), text_color='yellow'),
+        Sg.Text("", key="Files", size=(4, 1), text_color='yellow'),
         Sg.Text("", key="Percent", size=(4, 1), text_color='yellow'),
     ]
 ]
@@ -80,11 +90,13 @@ checkBox_list = [
 layout = [
     [Sg.Column(dirIn_list)],
     [Sg.Column(dirOut_list)],
+    [Sg.Column(thread_list)],
     [Sg.Column(checkBox_list)],
     [Sg.Column(button_list)],
 ]
 
 original_files = ["EventList", "Malware", "MITRE/CTI"]
+
 
 # This function check if there is a internet connection
 def check_connection():
@@ -106,7 +118,7 @@ def disable_buttons(method):
         window.FindElement('MalwareArcheology_Update_Button').Update(disabled=True)
     elif method == 2:
         window.FindElement('MITRE_CTI_Update_Button').Update(disabled=True)
-    else :
+    else:
         window.FindElement('EventList_Update_Button').Update(disabled=True)
         window.FindElement('MalwareArcheology_Update_Button').Update(disabled=True)
         window.FindElement('MITRE_CTI_Update_Button').Update(disabled=True)
@@ -128,10 +140,12 @@ def enable_button(j):
 def extract_event_thread(user_ids):
     global window
     start_time = time.time()
-    window.FindElement("Status").Update("Parsing the XML files...")
+    window.FindElement("Status").Update("\t\tParsing the XML files...")
     window.FindElement("Files").Update("0/0")
     window.FindElement("Percent").Update("0%")
-    extract_event_ids(user_ids, values['-FOLDER-IN-'], window)
+    thread_number = int(values['treads_key']) if (0 < int(values['treads_key']) < MAX_THREADS) else 2
+    print(thread_number)
+    extract_event_ids(user_ids, values['-FOLDER-IN-'], window, thread_number)
     user_ids = set(user_ids)
     print("\nThe user event ids:")
     print(user_ids)
@@ -143,7 +157,7 @@ def extract_event_thread(user_ids):
     window.FindElement('Scan_Button').Update(disabled=False)
     window.Refresh()
     createOutputAsMatrix(convert_output(TTPs))
-    if values['-FOLDER-OUT-'] is not "":
+    if values['-FOLDER-OUT-'] != "":
         copy_file_to_out_dir(values['-FOLDER-OUT-'])
 
 
@@ -153,8 +167,6 @@ def copy_file_to_out_dir(out_dir):
     original = r'' + cwd + '\\Mapping_Res_to_MitreAttack.xlsx'
     target = r''+out_dir + '/Mapping_Res_to_MitreAttack.xlsx'
     shutil.copyfile(original, target)
-
-
 
 
 # This function check if there is an update
@@ -329,7 +341,7 @@ while True:
         mitre_thread.start()
         window.FindElement(original_files[2]).Update("Updating...", text_color='yellow')
         disable_buttons(2)
-
-
+    elif event == 'max_threads':
+        window.FindElement("treads_key").Update(str(MAX_THREADS))
 
 window.close()

@@ -27,9 +27,8 @@ def reset_info():
     ExtractInfo.total_files = 0
 
 
-def extract_event_ids(event_ids, in_path, window):
+def extract_event_ids(event_ids, in_path, window, num_worker_threads):
     reset_info()
-    num_worker_threads = 2
     ExtractInfo.path = in_path
     print("retrieving data from = " + str(in_path))
     directory = glob.glob(os.path.join(in_path, '*.xml'))
@@ -55,7 +54,7 @@ def extract_xml(event_ids, file_name, window):
     logFile = minidom.parse(file_name)
     items = logFile.getElementsByTagName('EventID')
     ExtractInfo.size += len(items)
-    window.FindElement("Status").Update("Extracting event ids from " + str(ExtractInfo.path))
+    window.FindElement("Status").Update("\t\tExtracting Event IDs...")
     ExtractInfo.file_count += 1
     for x in items:
         ExtractInfo.count += 1
