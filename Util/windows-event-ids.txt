@@ -419,30 +419,30 @@ Windows	6421	A request was made to enable a device
 Windows	6422	A device was enabled
 Windows	6423	The installation of this device is forbidden by system policy
 Windows	6424	The installation of this device was allowed, after having previously been forbidden by policy
-Windows	8191 	Highest System-Defined Audit Message Value
-Event ID    1   Process creation
-Event ID    2   Process changed a file creation time
-Event ID    3   Network connection
-Event ID    4   Sysmon service state changed
-Event ID    5   Process terminated
-Event ID    6   Driver loaded
-Event ID    7   Image loaded
-Event ID    8   Create Remote Thread CreateRemoteThread
-Event ID    9   Raw Access Read RawAccessRead
-Event ID    10  Process Access ProcessAccess
-Event ID    11  File Create FileCreate
-Event ID    12  Registry Event RegistryEvent Object Creation and Deletion
-Event ID    13  Registry Event RegistryEvent Value set
-Event ID    14  Registry Event RegistryEvent Key and Value rename
-Event ID    15  File Create Stream Hash FileCreateStreamHash
-Event ID    16  Service Configuration Change ServiceConfigurationChange
-Event ID    17  Pipe Event PipeEvent Creation
-Event ID    18  Pipe Event PipeEvent Connected
-Event ID    19  Wmi Event WmiEvent WmiEventFilter activity Wmi Event Filter activity
-Event ID    20  Wmi Event WmiEvent WmiEventConsumer activity Wmi Event Consumer activity
-Event ID    21  Wmi Event WmiEvent WmiEventConsumerToFilter activity Wmi Event Consumer To Filter activity
-Event ID    22  DNS Event DNSEvent DNS Query
-Event ID    23  File Delete FileDelete
-Event ID    24  Clipboard Change ClipboardChange New content in the clipboard
-Event ID    25  Process Tampering ProcessTampering Process image change
-Event ID    255 Error
+Windows	8191	Highest System-Defined Audit Message Value
+Event ID	1	Process creation
+Event ID	2	Process changed a file creation time
+Event ID	3	Network connection
+Event ID	4	Sysmon service state changed
+Event ID	5	Process terminated
+Event ID	6	Driver loaded
+Event ID	7	Image loaded
+Event ID	8	Create Remote Thread CreateRemoteThread
+Event ID	9	Raw Access Read RawAccessRead
+Event ID	10	Process Access ProcessAccess
+Event ID	11	File Create FileCreate
+Event ID	12	Registry Event RegistryEvent Object Creation and Deletion
+Event ID	13	Registry Event RegistryEvent Value set
+Event ID	14	Registry Event RegistryEvent Key and Value rename
+Event ID	15	File Create Stream Hash FileCreateStreamHash
+Event ID	16	Service Configuration Change ServiceConfigurationChange
+Event ID	17	Pipe Event PipeEvent Creation
+Event ID	18	Pipe Event PipeEvent Connected
+Event ID	19	Wmi Event WmiEvent WmiEventFilter activity Wmi Event Filter activity
+Event ID	20	Wmi Event WmiEvent WmiEventConsumer activity Wmi Event Consumer activity
+Event ID	21	Wmi Event WmiEvent WmiEventConsumerToFilter activity Wmi Event Consumer To Filter activity
+Event ID	22	DNS Event DNSEvent DNS Query
+Event ID	23	File Delete FileDelete
+Event ID	24	Clipboard Change ClipboardChange New content in the clipboard
+Event ID	25	Process Tampering ProcessTampering Process image change
+Event ID	255	Error
