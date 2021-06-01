@@ -1,5 +1,7 @@
 import json
 import ctypes
+import os
+import shutil
 import time
 
 import PySimpleGUI as Sg
@@ -141,6 +143,18 @@ def extract_event_thread(user_ids):
     window.FindElement('Scan_Button').Update(disabled=False)
     window.Refresh()
     createOutputAsMatrix(convert_output(TTPs))
+    if values['-FOLDER-OUT-'] is not "":
+        copy_file_to_out_dir(values['-FOLDER-OUT-'])
+
+
+# copy the output file to the output dir
+def copy_file_to_out_dir(out_dir):
+    cwd = os.getcwd()
+    original = r'' + cwd + '\\Mapping_Res_to_MitreAttack.xlsx'
+    target = r''+out_dir + '/Mapping_Res_to_MitreAttack.xlsx'
+    shutil.copyfile(original, target)
+
+
 
 
 # This function check if there is an update
