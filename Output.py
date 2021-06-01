@@ -57,8 +57,8 @@ def createOutputAsMatrix(TTPs):
         techniques =  get_tactic_techniques(tactic)
         techniquesNum = len(techniques)
 
-        label = Label(tab1, text=str(tactic))
-        label.config(font=('Arial', 10))
+        label = Label(tab1, text=str(tactic),  wraplength=100)
+        label.config(font=('Arial bold', 9))
         label.grid(row=row-1, column=column, sticky="nsew", padx=1, pady=1)
         tab1.grid_columnconfigure(column, weight=1)
 
@@ -68,13 +68,13 @@ def createOutputAsMatrix(TTPs):
                 worksheet1.write(row, column, technique,foundFormat)
                 sucssesNum += 1
 
-                label = Label(tab1, text=str(technique), bg="red", fg="white" ,wraplength=500, underline=1)
+                label = Label(tab1, text=str(technique), bg="red", fg="white" ,wraplength=100)
 
             else:
-                label = Label(tab1, text=str(technique),wraplength=500, underline=1)
+                label = Label(tab1, text=str(technique),wraplength=100)
                 worksheet1.write(row, column, technique)
 
-            label.config(font=('Arial', 9), underline=True)
+            label.config(font=('Arial', 9))
             label.grid(row=row, column=column, sticky="nsew")
             tab1.grid_columnconfigure(column, weight=1)
 
