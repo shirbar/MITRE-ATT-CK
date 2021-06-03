@@ -8,7 +8,7 @@ import urllib.request
 import threading
 from datetime import datetime
 
-from Util.ExtractLogs import extract_event_ids
+from Util.ExtractLogs import extract_event_ids, terminate_threads
 from Util.MergeHashMaps import merge_hash_maps
 from Util.GetTTPs import get_ttp_from_event_ids
 import Methods.EventList as EventList
@@ -17,7 +17,7 @@ import Methods.Malware as Malware
 from Output import createOutputAsMatrix
 
 Sg.theme('DarkBlue13')
-MAX_THREADS = os.cpu_count()*5
+MAX_THREADS = os.cpu_count()*2
 
 
 dirIn_list = [
@@ -145,7 +145,7 @@ def extract_event_thread(user_ids):
     window.FindElement("Percent").Update("0%")
     thread_number = int(values['treads_key']) if (0 < int(values['treads_key']) < MAX_THREADS) else 2
     print(thread_number)
-    extract_event_ids(user_ids, values['-FOLDER-IN-'], window, thread_number)
+    extract_event_ids(user_ids, values['-FOLDER-IN-'], window, thread_number, extract_thread)
     user_ids = set(user_ids)
     print("\nThe user event ids:")
     print(user_ids)
@@ -263,6 +263,8 @@ while True:
     # End program if user closes the window or
     if event in (None, 'Exit'):
         terminate_thread(check_update_thread)
+        terminate_thread(extract_thread)
+        terminate_threads()
         break
     if event == 'Scan_Button':
         # checking if any of the check boxes are checked.
