@@ -40,7 +40,7 @@ dirOut_list = [
 thread_list = [
     [
         Sg.Text("Number of Threads:\t"),
-        Sg.In(size=(3, 1), enable_events=True, key='treads_key', default_text="2"),
+        Sg.In(size=(3, 1), enable_events=True, key='threads_key', default_text="2"),
         Sg.Text("/  " + str(MAX_THREADS)),
         Sg.Button("Max", key='max_threads'),
     ],
@@ -143,8 +143,7 @@ def extract_event_thread(user_ids):
     window.FindElement("Status").Update("\t\tParsing the XML files...")
     window.FindElement("Files").Update("0/0")
     window.FindElement("Percent").Update("0%")
-    thread_number = int(values['treads_key']) if (0 < int(values['treads_key']) < MAX_THREADS) else 2
-    print(thread_number)
+    thread_number = int(values['threads_key']) if (0 < int(values['threads_key']) <= MAX_THREADS) else 2
     extract_event_ids(user_ids, values['-FOLDER-IN-'], window, thread_number, extract_thread)
     user_ids = set(user_ids)
     print("\nThe user event ids:")
@@ -344,6 +343,6 @@ while True:
         window.FindElement(original_files[2]).Update("Updating...", text_color='yellow')
         disable_buttons(2)
     elif event == 'max_threads':
-        window.FindElement("treads_key").Update(str(MAX_THREADS))
+        window.FindElement("threads_key").Update(str(MAX_THREADS))
 
 window.close()

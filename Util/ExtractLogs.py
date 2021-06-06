@@ -38,6 +38,8 @@ def reset_info():
 def extract_event_ids(event_ids, in_path, window, num_worker_threads, extract_thread):
     global executor
     global main_thread
+    global stop
+    stop = False
     main_thread = extract_thread
     reset_info()
     print("retrieving data from = " + str(in_path))
@@ -51,7 +53,7 @@ def extract_event_ids(event_ids, in_path, window, num_worker_threads, extract_th
         pool.append(executor.submit(extract_xml, event_ids=event_ids, file_name=filename, window=window))
     for pool in concurrent.futures.as_completed(pool):
         pass
-
+    executor = None
     if len(event_ids) == 0:
         return False
     return True
@@ -81,6 +83,7 @@ def extract_xml(event_ids, file_name, window):
 def terminate_threads():
     global executor
     global stop
+    stop = True
     if executor is None:
         return
     stop = True
