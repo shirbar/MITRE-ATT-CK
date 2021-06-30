@@ -4,11 +4,6 @@ import glob
 import os
 import threading
 from asyncio import Queue
-from xml.dom import minidom
-from xml.dom.minidom import parseString
-from multiprocessing import Pool
-import PySimpleGUI as Sx
-from lxml import etree
 import xml.etree.ElementTree as ElementTree
 import re
 
@@ -105,20 +100,35 @@ def terminate_thread(thread):
         raise SystemError("PyThreadState_SetAsyncExc failed")
 
 
-"""
-    logFile = minidom.parse(file_name)
-    items = logFile.getElementsByTagName('EventID')
-    print("the items are: ")
-    ExtractInfo.size += len(items)
-    window.FindElement("Status").Update("\t\tExtracting Event IDs...")
-    ExtractInfo.file_count += 1
-    for x in items:
-        ExtractInfo.count += 1
-        event_ids.append(int(x.firstChild.data))
-        window.FindElement("Percent").Update(str(int((ExtractInfo.count * 100 // ExtractInfo.size) * (
-                    ExtractInfo.file_count / ExtractInfo.total_files))) + "%")
-    window.FindElement("Files").Update(str(ExtractInfo.file_count) + "/" + str(ExtractInfo.total_files))
-"""
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

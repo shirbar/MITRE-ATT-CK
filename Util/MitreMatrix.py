@@ -49,12 +49,3 @@ def get_tactic_techniques(tactic):
             tactics[name]= rid
 
     return tactics
-
-# def createMatrix ():
-#     src = get_data_from_branch("enterprise-attack")
-#     matrix = {}
-#     for tactic in tactics:
-#         tactic = tactic.lower()
-#         matrix[tactic]= get_tactic_techniques(src,tactic)
-#
-#     return matrix

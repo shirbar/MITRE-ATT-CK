@@ -2,14 +2,14 @@ import urllib.request
 import sqlite3
 import os.path
 
-
+# This function replace the current EventList.db file with a new one from the EventList git.
 def update_event_list_db():
     if os.path.exists("Databases/EventList.db"):
         os.remove("Databases/EventList.db")
     url = "https://raw.githubusercontent.com/miriamxyra/EventList/master/EventList/internal/data/EventList.db"
     urllib.request.urlretrieve(url, 'Databases/EventList.db')
 
-
+# This function return the hash map of EventList from the db file.
 def get_event_list_hash_map():
     EventListHashMap = {}
     if not os.path.exists("Databases/EventList.db"):
@@ -33,6 +33,7 @@ def get_event_list_hash_map():
         print("error while connecting to sqlite ", error)
 
 
+# This function return the hash map of EventList from the db file.
 def get_event_list_hash_map_for_check():
     EventListHashMap = {}
     if not os.path.exists("Databases/EventList2.db"):
@@ -55,7 +56,7 @@ def get_event_list_hash_map_for_check():
     except sqlite3.Error as error:
         print("error while connecting to sqlite ", error)
 
-
+# this function print the data inside Malware.db
 def show_db():
     conn = sqlite3.connect("Databases/EventList.db")
     cur = conn.cursor()
@@ -73,7 +74,7 @@ def show_db():
     names = list(map(lambda x: x[0], cur.description))  # show all the columns names
     print(names)
 
-
+# This function invert the hash map from (event id: [ttps]) to (ttp: [event ids])
 def invert_hash_map(mitre_hash_map):
     new_dic = {}
     for k, v in mitre_hash_map.items():
@@ -82,7 +83,8 @@ def invert_hash_map(mitre_hash_map):
 
     return new_dic
 
-
+# this function compere the old list from the db with new one from the internet
+# return true if update is needed else return false
 def check_for_update():
     # download a new db from github
     if os.path.exists("Databases/EventList2.db"):

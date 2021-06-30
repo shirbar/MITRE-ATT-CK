@@ -1,3 +1,4 @@
+# This function combine all the hash maps of the chosen methods.
 def merge_hash_maps(main_hash_map, external_hash_map):
     for key in external_hash_map.keys():
         if key in main_hash_map.keys():

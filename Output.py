@@ -1,12 +1,9 @@
 from Util.MitreMatrix import get_tactic_techniques
-import tkinter as tk
-from tkinter import filedialog, messagebox, ttk
 import xlsxwriter
-import math
 import xlrd
 from tkinter.ttk import Notebook,Entry
 from tkinter import Scale, Tk, Frame, Label, Button, WORD
-import textwrap
+
 
 
 tactics = ['reconnaissance','resource-development', 'initial-access', 'execution', 'persistence',

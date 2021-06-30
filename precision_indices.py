@@ -169,27 +169,18 @@ def get_malware_measure():
 # This function check is in_even is find in out_event or even part of it
 def if_in(in_event, out_event):
     count = 0
-    #print("in event = " + str(in_event))
-    #print("out_event = " + str(out_event))
-    #print("________________")
-
     for ttp in in_event:
         # for ttp in ttplist:
         if len(out_event) != 0:
             for item in out_event:
-                # print("-----item = " + str(item))
-                # print("+++++ttp = " + str(ttp[2:len(ttp)-2]))
                 if len(item) > 1 and type(item) != str:
                     for i in item:
-                        # print("iiiiiiii i = "+str(i))
                         if i == ttp[2:len(ttp) - 2]:
                             count = count + 1
                 elif item == ttp[2:len(ttp) - 2]:
                     count = count + 1
                 elif item in ttp or ttp in item:
                     count = count + 1
-        # return False
-    # print("count = " + str(count))
     if count > 0:
         return True
     else:

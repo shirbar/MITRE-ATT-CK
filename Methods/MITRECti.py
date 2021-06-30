@@ -1,23 +1,9 @@
 import json
-import urllib.request
 from urllib.request import urlopen
 import re
 import sqlite3
 import os.path
-#-------------
-import os, time
-import http.client
-import sys
-import pickle
-from datetime import datetime
-import smtplib
-from email.mime.text import MIMEText
-## importing socket module
-import socket
-
-#from git import Repo
-
-
+import os
 
 # This function pull mitre json and send to local DB the new hash map
 def get_mitre_cti_hash_map():
@@ -30,7 +16,6 @@ def get_mitre_cti_hash_map():
                 event_id_ = line_split[1]
                 header_ = line_split[2]
                 pattern_dict[header_] = event_id_
-            #print(pattern_dict)
         except:
             print("Error - failed to open the file windows-event-ids.txt")
             exit()
@@ -42,7 +27,6 @@ def get_mitre_cti_hash_map():
                     if word.lower() not in filter_words and word in text['x_mitre_detection']:
                         technique = text['external_references'][0]['external_id']
                         matched_words.append(word)
-                        # print(text['x_mitre_detection'])
                         if (len(technique) > 1) and (technique in mitre_hash_technique.keys()):
                             mitre_hash_technique[technique].append(pattern_dict[header])
                         else:
@@ -63,7 +47,6 @@ def get_mitre_cti_hash_map():
 
     for i in data['objects']:
         if 'x_mitre_data_sources' in i:
-            # if 'Windows event logs' in i['x_mitre_data_sources']:
             if 'Event ID' in i['x_mitre_detection']:
                 eventIds = get_event_ids(i['x_mitre_detection'])
                 key = i['external_references'][0]['external_id']
@@ -72,12 +55,10 @@ def get_mitre_cti_hash_map():
                 else:
                     mitre_hash_technique[key] = eventIds
         search_pattern(i)
-    #print(mitre_hash_technique)
     matched_words = set(matched_words)
     print(matched_words)
     print("inverting------")
     return invert_mitre_hash_map(mitre_hash_technique)
-    # return mitre_hash_technique
 
 
 # This function gets the x_mire_detection str.split string and return the event ids thet can be use with this techniqe
@@ -89,20 +70,15 @@ def get_event_ids(description):
     eventIds = set(eventIds)
     return list(eventIds)
 
-
+# This function invert the hash map from (event id: [ttps]) to (ttp: [event ids])
 def invert_mitre_hash_map(mitre_hash_map):
     new_dic = {}
-    print("original hash map:")
-    print(mitre_hash_map)
-    print("-------------\n\n")
     for k, v in mitre_hash_map.items():
         for x in v:
             if int(x) not in new_dic.keys():
                 new_dic[int(x)] = list(k)
             elif k not in new_dic[int(x)]:
                 new_dic[int(x)].append(k)
-
-    print(new_dic)
     return new_dic
 
 
@@ -139,18 +115,15 @@ def save_mitre_cti_to_db():
     conn.commit()
 
     mitre_cti_last_modify = get_lest_modified_date()
-    #print_check(mitre_cti_last_modify)
     mitre_cti_last_modify = [(str(i), str(mitre_cti_last_modify[i])) for i in mitre_cti_last_modify]
-    #print_check(mitre_cti_last_modify)
     insert_command = "INSERT INTO mitre_cti_last_modify VALUES(?,?);"
 
 
     cur.executemany(insert_command, mitre_cti_last_modify)
     conn.commit()
-    # show_db()
 
 
-# this function shwos the data inside Mitre_CTI.db
+# this function print the data inside Malware.db
 def show_db():
     conn = sqlite3.connect("Databases/Mitre_CTI.db")
     cur = conn.cursor()
@@ -164,10 +137,10 @@ def show_db():
     print("Mitre_CTI.db_end______________________________________________________________________________")
 
 
-# TODO to remove to ' "['T1558.004']" ' and change it to -> 'T1558.004'
+# This function return the mitre/cti hash map from the local db.
 def get_mitre_cti_hash_map_from_db():
     mitreCTIHashMap = {}
-    if not os.path.exists("Databases/Mitre_CTI.db"):  # or "Databases/Mitre_CTI.db"
+    if not os.path.exists("Databases/Mitre_CTI.db"):
         save_mitre_cti_to_db()
     try:
         sqliteConnection = sqlite3.connect("Databases/Mitre_CTI.db")
@@ -189,7 +162,7 @@ def get_mitre_cti_hash_map_from_db():
     except sqlite3.Error as error:
         print("error while connecting to sqlite ", error)
 
-
+# This function return an hash map of modify date and ttp's id as a key from the db.
 def get_modify_date_from_db():
     mitre_modify_hash_map = {}
     if not os.path.exists("Databases/Mitre_CTI.db"):  # or "Databases/Mitre_CTI.db"
@@ -230,7 +203,7 @@ def check_for_update():
 
     return False
 
-
+# This function return an hash map of modify date and ttp's id as a key from the Mitre/CTI git.
 def get_lest_modified_date():
     modified_hash_map = {}
 
@@ -250,20 +223,6 @@ def get_lest_modified_date():
                         modified_hash_map[key] = []
                         modified_hash_map[key].append(date)
 
-                    #print("TTTTTTrue")
-
-    #print(modified_hash_map)
     return modified_hash_map
 
-
-def print_check(x):
-    print("---------------------------------------------------------------------------------------------------")
-    print("_+_++_++_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_++_+_+_+_+_+_+_+_+_++_+_+_+_+_+_+_")
-    print("_+_++_++_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_++_+_+_+_+_+_+_+_+_++_+_+_+_+_+_+_")
-    print("_+_++_++_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_++_+_+_+_+_+_+_+_+_++_+_+_+_+_+_+_")
-    print(x)
-    print("_+_++_++_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_++_+_+_+_+_+_+_+_+_++_+_+_+_+_+_+_")
-    print("_+_++_++_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_++_+_+_+_+_+_+_+_+_++_+_+_+_+_+_+_")
-    print("_+_++_++_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_++_+_+_+_+_+_+_+_+_++_+_+_+_+_+_+_")
-    print("---------------------------------------------------------------------------------------------------")
 
