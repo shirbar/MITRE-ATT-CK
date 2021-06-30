@@ -86,7 +86,6 @@ def invert_mitre_hash_map(mitre_hash_map):
 # Also this function make update for mitre cti db.
 # Also save to db the lest modify date of the ttps.
 def save_mitre_cti_to_db():
-
     conn = sqlite3.connect("Databases/Mitre_CTI.db")
     cur = conn.cursor()
 
